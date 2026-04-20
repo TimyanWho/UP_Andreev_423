@@ -1,0 +1,34 @@
+﻿<Page x:Class="UP_Andreev_423.Pages.BookEditPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="BookEditPage"
+      Background="#F3F3F3">
+
+    <Grid>
+        <Border Background="White" CornerRadius="14" Padding="20">
+            <StackPanel Width="520">
+                <TextBlock Text="Добавление / редактирование книги"
+                           FontSize="22"
+                           FontWeight="Bold"
+                           Margin="0,0,0,14"/>
+
+                <TextBlock Text="Название"/>
+                <TextBox/>
+
+                <TextBlock Text="Описание"/>
+                <TextBox Height="80" AcceptsReturn="True" TextWrapping="Wrap"/>
+
+                <TextBlock Text="Обложка"/>
+                <TextBox/>
+
+                <TextBlock Text="Жанры"/>
+                <TextBox/>
+
+                <TextBlock Text="Текст книги"/>
+                <TextBox Height="180" AcceptsReturn="True" TextWrapping="Wrap"/>
+
+                <Button Content="Сохранить" Margin="0,16,0,0" Height="38"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Page>

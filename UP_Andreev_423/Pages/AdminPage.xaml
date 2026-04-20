@@ -1,0 +1,26 @@
+﻿<Page x:Class="UP_Andreev_423.Pages.AdminPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="AdminPage"
+      Background="#F3F3F3">
+
+    <Grid>
+        <TabControl>
+            <TabItem Header="Жалобы">
+                <DataGrid AutoGenerateColumns="True" IsReadOnly="True" CanUserAddRows="False"/>
+            </TabItem>
+            <TabItem Header="Снятие заморозки">
+                <DataGrid AutoGenerateColumns="True" IsReadOnly="True" CanUserAddRows="False"/>
+            </TabItem>
+            <TabItem Header="Заявки автора">
+                <DataGrid AutoGenerateColumns="True" IsReadOnly="True" CanUserAddRows="False"/>
+            </TabItem>
+            <TabItem Header="Заморозки">
+                <DataGrid AutoGenerateColumns="True" IsReadOnly="True" CanUserAddRows="False"/>
+            </TabItem>
+            <TabItem Header="Пользователи">
+                <DataGrid AutoGenerateColumns="True" IsReadOnly="True" CanUserAddRows="False"/>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Page>

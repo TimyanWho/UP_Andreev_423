@@ -1,0 +1,908 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="Хранилище UP_Andreev_423Model" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="AuthorRoleApplications">
+          <Key>
+            <PropertyRef Name="ApplicationId" />
+          </Key>
+          <Property Name="ApplicationId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="Motivation" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Status" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="AdminComment" Type="nvarchar(max)" />
+          <Property Name="CreatedAt" Type="datetime2" Precision="0" Nullable="false" />
+          <Property Name="ReviewedAt" Type="datetime2" Precision="0" />
+          <Property Name="ReviewedByUserId" Type="int" />
+        </EntityType>
+        <EntityType Name="BookComplaints">
+          <Key>
+            <PropertyRef Name="ComplaintId" />
+          </Key>
+          <Property Name="ComplaintId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="BookId" Type="int" Nullable="false" />
+          <Property Name="ComplainingUserId" Type="int" Nullable="false" />
+          <Property Name="Reason" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Status" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="AdminComment" Type="nvarchar(max)" />
+          <Property Name="CreatedAt" Type="datetime2" Precision="0" Nullable="false" />
+          <Property Name="ReviewedAt" Type="datetime2" Precision="0" />
+          <Property Name="ReviewedByUserId" Type="int" />
+        </EntityType>
+        <EntityType Name="BookGenres">
+          <Key>
+            <PropertyRef Name="BookId" />
+            <PropertyRef Name="GenreId" />
+          </Key>
+          <Property Name="BookId" Type="int" Nullable="false" />
+          <Property Name="GenreId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Books">
+          <Key>
+            <PropertyRef Name="BookId" />
+          </Key>
+          <Property Name="BookId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="Description" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="TextContent" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="CoverImagePath" Type="nvarchar" MaxLength="255" />
+          <Property Name="AuthorUserId" Type="int" Nullable="false" />
+          <Property Name="Rating" Type="decimal" Precision="3" Scale="2" Nullable="false" />
+          <Property Name="IsFrozen" Type="bit" Nullable="false" />
+          <Property Name="FreezeReason" Type="nvarchar" MaxLength="500" />
+          <Property Name="PublishedAt" Type="datetime2" Precision="0" Nullable="false" />
+        </EntityType>
+        <EntityType Name="FreezeAppeals">
+          <Key>
+            <PropertyRef Name="AppealId" />
+          </Key>
+          <Property Name="AppealId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TargetType" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="TargetId" Type="int" Nullable="false" />
+          <Property Name="RequesterUserId" Type="int" Nullable="false" />
+          <Property Name="Reason" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Status" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="AdminComment" Type="nvarchar(max)" />
+          <Property Name="CreatedAt" Type="datetime2" Precision="0" Nullable="false" />
+          <Property Name="ReviewedAt" Type="datetime2" Precision="0" />
+          <Property Name="ReviewedByUserId" Type="int" />
+        </EntityType>
+        <EntityType Name="Genres">
+          <Key>
+            <PropertyRef Name="GenreId" />
+          </Key>
+          <Property Name="GenreId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ReadingListItems">
+          <Key>
+            <PropertyRef Name="UserId" />
+            <PropertyRef Name="BookId" />
+          </Key>
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="BookId" Type="int" Nullable="false" />
+          <Property Name="Status" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="UpdatedAt" Type="datetime2" Precision="0" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Reviews">
+          <Key>
+            <PropertyRef Name="ReviewId" />
+          </Key>
+          <Property Name="ReviewId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="BookId" Type="int" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="Rating" Type="tinyint" Nullable="false" />
+          <Property Name="ReviewText" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="IsFrozen" Type="bit" Nullable="false" />
+          <Property Name="FreezeReason" Type="nvarchar" MaxLength="500" />
+          <Property Name="CreatedAt" Type="datetime2" Precision="0" Nullable="false" />
+        </EntityType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="principal_id" Type="int" Nullable="false" />
+          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="version" Type="int" />
+          <Property Name="definition" Type="varbinary(max)" />
+        </EntityType>
+        <EntityType Name="Users">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="UserId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FullName" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="Login" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Email" Type="nvarchar" MaxLength="120" Nullable="false" />
+          <Property Name="Password" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="RoleName" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="IsFrozen" Type="bit" Nullable="false" />
+          <Property Name="FreezeReason" Type="nvarchar" MaxLength="500" />
+          <Property Name="CreatedAt" Type="datetime2" Precision="0" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_AuthorRoleApplications_Admins">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="AuthorRoleApplications" Type="Self.AuthorRoleApplications" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="AuthorRoleApplications">
+              <PropertyRef Name="ReviewedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AuthorRoleApplications_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="AuthorRoleApplications" Type="Self.AuthorRoleApplications" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="AuthorRoleApplications">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BookComplaints_Admins">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="BookComplaints" Type="Self.BookComplaints" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="BookComplaints">
+              <PropertyRef Name="ReviewedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BookComplaints_Books">
+          <End Role="Books" Type="Self.Books" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="BookComplaints" Type="Self.BookComplaints" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Books">
+              <PropertyRef Name="BookId" />
+            </Principal>
+            <Dependent Role="BookComplaints">
+              <PropertyRef Name="BookId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BookComplaints_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="BookComplaints" Type="Self.BookComplaints" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="BookComplaints">
+              <PropertyRef Name="ComplainingUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BookGenres_Books">
+          <End Role="Books" Type="Self.Books" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="BookGenres" Type="Self.BookGenres" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Books">
+              <PropertyRef Name="BookId" />
+            </Principal>
+            <Dependent Role="BookGenres">
+              <PropertyRef Name="BookId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BookGenres_Genres">
+          <End Role="Genres" Type="Self.Genres" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="BookGenres" Type="Self.BookGenres" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Genres">
+              <PropertyRef Name="GenreId" />
+            </Principal>
+            <Dependent Role="BookGenres">
+              <PropertyRef Name="GenreId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Books_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Books" Type="Self.Books" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Books">
+              <PropertyRef Name="AuthorUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FreezeAppeals_Admins">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="FreezeAppeals" Type="Self.FreezeAppeals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="FreezeAppeals">
+              <PropertyRef Name="ReviewedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FreezeAppeals_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="FreezeAppeals" Type="Self.FreezeAppeals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="FreezeAppeals">
+              <PropertyRef Name="RequesterUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ReadingListItems_Books">
+          <End Role="Books" Type="Self.Books" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ReadingListItems" Type="Self.ReadingListItems" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Books">
+              <PropertyRef Name="BookId" />
+            </Principal>
+            <Dependent Role="ReadingListItems">
+              <PropertyRef Name="BookId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ReadingListItems_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ReadingListItems" Type="Self.ReadingListItems" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="ReadingListItems">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Reviews_Books">
+          <End Role="Books" Type="Self.Books" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Reviews" Type="Self.Reviews" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Books">
+              <PropertyRef Name="BookId" />
+            </Principal>
+            <Dependent Role="Reviews">
+              <PropertyRef Name="BookId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Reviews_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Reviews" Type="Self.Reviews" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Reviews">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="Хранилище UP_Andreev_423ModelContainer">
+          <EntitySet Name="AuthorRoleApplications" EntityType="Self.AuthorRoleApplications" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="BookComplaints" EntityType="Self.BookComplaints" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="BookGenres" EntityType="Self.BookGenres" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Books" EntityType="Self.Books" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="FreezeAppeals" EntityType="Self.FreezeAppeals" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Genres" EntityType="Self.Genres" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ReadingListItems" EntityType="Self.ReadingListItems" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Reviews" EntityType="Self.Reviews" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_AuthorRoleApplications_Admins" Association="Self.FK_AuthorRoleApplications_Admins">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="AuthorRoleApplications" EntitySet="AuthorRoleApplications" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AuthorRoleApplications_Users" Association="Self.FK_AuthorRoleApplications_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="AuthorRoleApplications" EntitySet="AuthorRoleApplications" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BookComplaints_Admins" Association="Self.FK_BookComplaints_Admins">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="BookComplaints" EntitySet="BookComplaints" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BookComplaints_Books" Association="Self.FK_BookComplaints_Books">
+            <End Role="Books" EntitySet="Books" />
+            <End Role="BookComplaints" EntitySet="BookComplaints" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BookComplaints_Users" Association="Self.FK_BookComplaints_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="BookComplaints" EntitySet="BookComplaints" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BookGenres_Books" Association="Self.FK_BookGenres_Books">
+            <End Role="Books" EntitySet="Books" />
+            <End Role="BookGenres" EntitySet="BookGenres" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BookGenres_Genres" Association="Self.FK_BookGenres_Genres">
+            <End Role="Genres" EntitySet="Genres" />
+            <End Role="BookGenres" EntitySet="BookGenres" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Books_Users" Association="Self.FK_Books_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Books" EntitySet="Books" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FreezeAppeals_Admins" Association="Self.FK_FreezeAppeals_Admins">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="FreezeAppeals" EntitySet="FreezeAppeals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FreezeAppeals_Users" Association="Self.FK_FreezeAppeals_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="FreezeAppeals" EntitySet="FreezeAppeals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ReadingListItems_Books" Association="Self.FK_ReadingListItems_Books">
+            <End Role="Books" EntitySet="Books" />
+            <End Role="ReadingListItems" EntitySet="ReadingListItems" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ReadingListItems_Users" Association="Self.FK_ReadingListItems_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="ReadingListItems" EntitySet="ReadingListItems" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Reviews_Books" Association="Self.FK_Reviews_Books">
+            <End Role="Books" EntitySet="Books" />
+            <End Role="Reviews" EntitySet="Reviews" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Reviews_Users" Association="Self.FK_Reviews_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Reviews" EntitySet="Reviews" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="UP_Andreev_423Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="AuthorRoleApplications">
+          <Key>
+            <PropertyRef Name="ApplicationId" />
+          </Key>
+          <Property Name="ApplicationId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="Motivation" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="AdminComment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="ReviewedAt" Type="DateTime" Precision="0" />
+          <Property Name="ReviewedByUserId" Type="Int32" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_AuthorRoleApplications_Admins" FromRole="AuthorRoleApplications" ToRole="Users" />
+          <NavigationProperty Name="Users1" Relationship="Self.FK_AuthorRoleApplications_Users" FromRole="AuthorRoleApplications" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="BookComplaints">
+          <Key>
+            <PropertyRef Name="ComplaintId" />
+          </Key>
+          <Property Name="ComplaintId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="BookId" Type="Int32" Nullable="false" />
+          <Property Name="ComplainingUserId" Type="Int32" Nullable="false" />
+          <Property Name="Reason" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="AdminComment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="ReviewedAt" Type="DateTime" Precision="0" />
+          <Property Name="ReviewedByUserId" Type="Int32" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_BookComplaints_Admins" FromRole="BookComplaints" ToRole="Users" />
+          <NavigationProperty Name="Books" Relationship="Self.FK_BookComplaints_Books" FromRole="BookComplaints" ToRole="Books" />
+          <NavigationProperty Name="Users1" Relationship="Self.FK_BookComplaints_Users" FromRole="BookComplaints" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="Books">
+          <Key>
+            <PropertyRef Name="BookId" />
+          </Key>
+          <Property Name="BookId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Title" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="TextContent" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="CoverImagePath" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="AuthorUserId" Type="Int32" Nullable="false" />
+          <Property Name="Rating" Type="Decimal" Precision="3" Scale="2" Nullable="false" />
+          <Property Name="IsFrozen" Type="Boolean" Nullable="false" />
+          <Property Name="FreezeReason" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="PublishedAt" Type="DateTime" Nullable="false" Precision="0" />
+          <NavigationProperty Name="BookComplaints" Relationship="Self.FK_BookComplaints_Books" FromRole="Books" ToRole="BookComplaints" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_Books_Users" FromRole="Books" ToRole="Users" />
+          <NavigationProperty Name="ReadingListItems" Relationship="Self.FK_ReadingListItems_Books" FromRole="Books" ToRole="ReadingListItems" />
+          <NavigationProperty Name="Reviews" Relationship="Self.FK_Reviews_Books" FromRole="Books" ToRole="Reviews" />
+          <NavigationProperty Name="Genres" Relationship="Self.BookGenres" FromRole="Books" ToRole="Genres" />
+        </EntityType>
+        <EntityType Name="FreezeAppeals">
+          <Key>
+            <PropertyRef Name="AppealId" />
+          </Key>
+          <Property Name="AppealId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TargetType" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="TargetId" Type="Int32" Nullable="false" />
+          <Property Name="RequesterUserId" Type="Int32" Nullable="false" />
+          <Property Name="Reason" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="AdminComment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="ReviewedAt" Type="DateTime" Precision="0" />
+          <Property Name="ReviewedByUserId" Type="Int32" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_FreezeAppeals_Admins" FromRole="FreezeAppeals" ToRole="Users" />
+          <NavigationProperty Name="Users1" Relationship="Self.FK_FreezeAppeals_Users" FromRole="FreezeAppeals" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="Genres">
+          <Key>
+            <PropertyRef Name="GenreId" />
+          </Key>
+          <Property Name="GenreId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Books" Relationship="Self.BookGenres" FromRole="Genres" ToRole="Books" />
+        </EntityType>
+        <EntityType Name="ReadingListItems">
+          <Key>
+            <PropertyRef Name="UserId" />
+            <PropertyRef Name="BookId" />
+          </Key>
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="BookId" Type="Int32" Nullable="false" />
+          <Property Name="Status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="UpdatedAt" Type="DateTime" Nullable="false" Precision="0" />
+          <NavigationProperty Name="Books" Relationship="Self.FK_ReadingListItems_Books" FromRole="ReadingListItems" ToRole="Books" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_ReadingListItems_Users" FromRole="ReadingListItems" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="Reviews">
+          <Key>
+            <PropertyRef Name="ReviewId" />
+          </Key>
+          <Property Name="ReviewId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="BookId" Type="Int32" Nullable="false" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="Rating" Type="Byte" Nullable="false" />
+          <Property Name="ReviewText" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="IsFrozen" Type="Boolean" Nullable="false" />
+          <Property Name="FreezeReason" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="0" />
+          <NavigationProperty Name="Books" Relationship="Self.FK_Reviews_Books" FromRole="Reviews" ToRole="Books" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_Reviews_Users" FromRole="Reviews" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="principal_id" Type="Int32" Nullable="false" />
+          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="version" Type="Int32" />
+          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="Users">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="UserId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FullName" Type="String" MaxLength="150" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Login" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Email" Type="String" MaxLength="120" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Password" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="RoleName" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="IsFrozen" Type="Boolean" Nullable="false" />
+          <Property Name="FreezeReason" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="0" />
+          <NavigationProperty Name="AuthorRoleApplications" Relationship="Self.FK_AuthorRoleApplications_Admins" FromRole="Users" ToRole="AuthorRoleApplications" />
+          <NavigationProperty Name="AuthorRoleApplications1" Relationship="Self.FK_AuthorRoleApplications_Users" FromRole="Users" ToRole="AuthorRoleApplications" />
+          <NavigationProperty Name="BookComplaints" Relationship="Self.FK_BookComplaints_Admins" FromRole="Users" ToRole="BookComplaints" />
+          <NavigationProperty Name="BookComplaints1" Relationship="Self.FK_BookComplaints_Users" FromRole="Users" ToRole="BookComplaints" />
+          <NavigationProperty Name="Books" Relationship="Self.FK_Books_Users" FromRole="Users" ToRole="Books" />
+          <NavigationProperty Name="FreezeAppeals" Relationship="Self.FK_FreezeAppeals_Admins" FromRole="Users" ToRole="FreezeAppeals" />
+          <NavigationProperty Name="FreezeAppeals1" Relationship="Self.FK_FreezeAppeals_Users" FromRole="Users" ToRole="FreezeAppeals" />
+          <NavigationProperty Name="ReadingListItems" Relationship="Self.FK_ReadingListItems_Users" FromRole="Users" ToRole="ReadingListItems" />
+          <NavigationProperty Name="Reviews" Relationship="Self.FK_Reviews_Users" FromRole="Users" ToRole="Reviews" />
+        </EntityType>
+        <Association Name="FK_AuthorRoleApplications_Admins">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="AuthorRoleApplications" Type="Self.AuthorRoleApplications" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="AuthorRoleApplications">
+              <PropertyRef Name="ReviewedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AuthorRoleApplications_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="AuthorRoleApplications" Type="Self.AuthorRoleApplications" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="AuthorRoleApplications">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BookComplaints_Admins">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="BookComplaints" Type="Self.BookComplaints" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="BookComplaints">
+              <PropertyRef Name="ReviewedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BookComplaints_Books">
+          <End Role="Books" Type="Self.Books" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="BookComplaints" Type="Self.BookComplaints" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Books">
+              <PropertyRef Name="BookId" />
+            </Principal>
+            <Dependent Role="BookComplaints">
+              <PropertyRef Name="BookId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BookComplaints_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="BookComplaints" Type="Self.BookComplaints" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="BookComplaints">
+              <PropertyRef Name="ComplainingUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Books_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Books" Type="Self.Books" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Books">
+              <PropertyRef Name="AuthorUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ReadingListItems_Books">
+          <End Role="Books" Type="Self.Books" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ReadingListItems" Type="Self.ReadingListItems" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Books">
+              <PropertyRef Name="BookId" />
+            </Principal>
+            <Dependent Role="ReadingListItems">
+              <PropertyRef Name="BookId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Reviews_Books">
+          <End Role="Books" Type="Self.Books" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Reviews" Type="Self.Reviews" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Books">
+              <PropertyRef Name="BookId" />
+            </Principal>
+            <Dependent Role="Reviews">
+              <PropertyRef Name="BookId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FreezeAppeals_Admins">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="FreezeAppeals" Type="Self.FreezeAppeals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="FreezeAppeals">
+              <PropertyRef Name="ReviewedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FreezeAppeals_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="FreezeAppeals" Type="Self.FreezeAppeals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="FreezeAppeals">
+              <PropertyRef Name="RequesterUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ReadingListItems_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ReadingListItems" Type="Self.ReadingListItems" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="ReadingListItems">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Reviews_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Reviews" Type="Self.Reviews" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Reviews">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="BookGenres">
+          <End Role="Books" Type="Self.Books" Multiplicity="*" />
+          <End Role="Genres" Type="Self.Genres" Multiplicity="*" />
+        </Association>
+        <EntityContainer Name="UP_Andreev_423Entities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="AuthorRoleApplications" EntityType="Self.AuthorRoleApplications" />
+          <EntitySet Name="BookComplaints" EntityType="Self.BookComplaints" />
+          <EntitySet Name="Books" EntityType="Self.Books" />
+          <EntitySet Name="FreezeAppeals" EntityType="Self.FreezeAppeals" />
+          <EntitySet Name="Genres" EntityType="Self.Genres" />
+          <EntitySet Name="ReadingListItems" EntityType="Self.ReadingListItems" />
+          <EntitySet Name="Reviews" EntityType="Self.Reviews" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" />
+          <EntitySet Name="Users" EntityType="Self.Users" />
+          <AssociationSet Name="FK_AuthorRoleApplications_Admins" Association="Self.FK_AuthorRoleApplications_Admins">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="AuthorRoleApplications" EntitySet="AuthorRoleApplications" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AuthorRoleApplications_Users" Association="Self.FK_AuthorRoleApplications_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="AuthorRoleApplications" EntitySet="AuthorRoleApplications" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BookComplaints_Admins" Association="Self.FK_BookComplaints_Admins">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="BookComplaints" EntitySet="BookComplaints" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BookComplaints_Books" Association="Self.FK_BookComplaints_Books">
+            <End Role="Books" EntitySet="Books" />
+            <End Role="BookComplaints" EntitySet="BookComplaints" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BookComplaints_Users" Association="Self.FK_BookComplaints_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="BookComplaints" EntitySet="BookComplaints" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Books_Users" Association="Self.FK_Books_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Books" EntitySet="Books" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ReadingListItems_Books" Association="Self.FK_ReadingListItems_Books">
+            <End Role="Books" EntitySet="Books" />
+            <End Role="ReadingListItems" EntitySet="ReadingListItems" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Reviews_Books" Association="Self.FK_Reviews_Books">
+            <End Role="Books" EntitySet="Books" />
+            <End Role="Reviews" EntitySet="Reviews" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FreezeAppeals_Admins" Association="Self.FK_FreezeAppeals_Admins">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="FreezeAppeals" EntitySet="FreezeAppeals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FreezeAppeals_Users" Association="Self.FK_FreezeAppeals_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="FreezeAppeals" EntitySet="FreezeAppeals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ReadingListItems_Users" Association="Self.FK_ReadingListItems_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="ReadingListItems" EntitySet="ReadingListItems" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Reviews_Users" Association="Self.FK_Reviews_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Reviews" EntitySet="Reviews" />
+          </AssociationSet>
+          <AssociationSet Name="BookGenres" Association="Self.BookGenres">
+            <End Role="Books" EntitySet="Books" />
+            <End Role="Genres" EntitySet="Genres" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="Хранилище UP_Andreev_423ModelContainer" CdmEntityContainer="UP_Andreev_423Entities">
+          <EntitySetMapping Name="AuthorRoleApplications">
+            <EntityTypeMapping TypeName="UP_Andreev_423Model.AuthorRoleApplications">
+              <MappingFragment StoreEntitySet="AuthorRoleApplications">
+                <ScalarProperty Name="ApplicationId" ColumnName="ApplicationId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Motivation" ColumnName="Motivation" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="AdminComment" ColumnName="AdminComment" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="ReviewedAt" ColumnName="ReviewedAt" />
+                <ScalarProperty Name="ReviewedByUserId" ColumnName="ReviewedByUserId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="BookComplaints">
+            <EntityTypeMapping TypeName="UP_Andreev_423Model.BookComplaints">
+              <MappingFragment StoreEntitySet="BookComplaints">
+                <ScalarProperty Name="ComplaintId" ColumnName="ComplaintId" />
+                <ScalarProperty Name="BookId" ColumnName="BookId" />
+                <ScalarProperty Name="ComplainingUserId" ColumnName="ComplainingUserId" />
+                <ScalarProperty Name="Reason" ColumnName="Reason" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="AdminComment" ColumnName="AdminComment" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="ReviewedAt" ColumnName="ReviewedAt" />
+                <ScalarProperty Name="ReviewedByUserId" ColumnName="ReviewedByUserId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Books">
+            <EntityTypeMapping TypeName="UP_Andreev_423Model.Books">
+              <MappingFragment StoreEntitySet="Books">
+                <ScalarProperty Name="BookId" ColumnName="BookId" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="TextContent" ColumnName="TextContent" />
+                <ScalarProperty Name="CoverImagePath" ColumnName="CoverImagePath" />
+                <ScalarProperty Name="AuthorUserId" ColumnName="AuthorUserId" />
+                <ScalarProperty Name="Rating" ColumnName="Rating" />
+                <ScalarProperty Name="IsFrozen" ColumnName="IsFrozen" />
+                <ScalarProperty Name="FreezeReason" ColumnName="FreezeReason" />
+                <ScalarProperty Name="PublishedAt" ColumnName="PublishedAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FreezeAppeals">
+            <EntityTypeMapping TypeName="UP_Andreev_423Model.FreezeAppeals">
+              <MappingFragment StoreEntitySet="FreezeAppeals">
+                <ScalarProperty Name="AppealId" ColumnName="AppealId" />
+                <ScalarProperty Name="TargetType" ColumnName="TargetType" />
+                <ScalarProperty Name="TargetId" ColumnName="TargetId" />
+                <ScalarProperty Name="RequesterUserId" ColumnName="RequesterUserId" />
+                <ScalarProperty Name="Reason" ColumnName="Reason" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="AdminComment" ColumnName="AdminComment" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="ReviewedAt" ColumnName="ReviewedAt" />
+                <ScalarProperty Name="ReviewedByUserId" ColumnName="ReviewedByUserId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Genres">
+            <EntityTypeMapping TypeName="UP_Andreev_423Model.Genres">
+              <MappingFragment StoreEntitySet="Genres">
+                <ScalarProperty Name="GenreId" ColumnName="GenreId" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ReadingListItems">
+            <EntityTypeMapping TypeName="UP_Andreev_423Model.ReadingListItems">
+              <MappingFragment StoreEntitySet="ReadingListItems">
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="BookId" ColumnName="BookId" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Reviews">
+            <EntityTypeMapping TypeName="UP_Andreev_423Model.Reviews">
+              <MappingFragment StoreEntitySet="Reviews">
+                <ScalarProperty Name="ReviewId" ColumnName="ReviewId" />
+                <ScalarProperty Name="BookId" ColumnName="BookId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Rating" ColumnName="Rating" />
+                <ScalarProperty Name="ReviewText" ColumnName="ReviewText" />
+                <ScalarProperty Name="IsFrozen" ColumnName="IsFrozen" />
+                <ScalarProperty Name="FreezeReason" ColumnName="FreezeReason" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="sysdiagrams">
+            <EntityTypeMapping TypeName="UP_Andreev_423Model.sysdiagrams">
+              <MappingFragment StoreEntitySet="sysdiagrams">
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
+                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="definition" ColumnName="definition" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Users">
+            <EntityTypeMapping TypeName="UP_Andreev_423Model.Users">
+              <MappingFragment StoreEntitySet="Users">
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="FullName" ColumnName="FullName" />
+                <ScalarProperty Name="Login" ColumnName="Login" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="RoleName" ColumnName="RoleName" />
+                <ScalarProperty Name="IsFrozen" ColumnName="IsFrozen" />
+                <ScalarProperty Name="FreezeReason" ColumnName="FreezeReason" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="BookGenres" TypeName="UP_Andreev_423Model.BookGenres" StoreEntitySet="BookGenres">
+            <EndProperty Name="Books">
+              <ScalarProperty Name="BookId" ColumnName="BookId" />
+            </EndProperty>
+            <EndProperty Name="Genres">
+              <ScalarProperty Name="GenreId" ColumnName="GenreId" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Нет" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
