@@ -55,6 +55,21 @@
           <Property Name="FreezeReason" Type="nvarchar" MaxLength="500" />
           <Property Name="PublishedAt" Type="datetime2" Precision="0" Nullable="false" />
         </EntityType>
+        <EntityType Name="Complaints">
+          <Key>
+            <PropertyRef Name="ComplaintId" />
+          </Key>
+          <Property Name="ComplaintId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ComplainerUserId" Type="int" Nullable="false" />
+          <Property Name="TargetBookId" Type="int" />
+          <Property Name="TargetReviewId" Type="int" />
+          <Property Name="Reason" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Status" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="ModeratorUserId" Type="int" />
+          <Property Name="DecisionComment" Type="nvarchar(max)" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="DecidedAt" Type="datetime" />
+        </EntityType>
         <EntityType Name="FreezeAppeals">
           <Key>
             <PropertyRef Name="AppealId" />
@@ -75,7 +90,8 @@
             <PropertyRef Name="GenreId" />
           </Key>
           <Property Name="GenreId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="GenreName" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="GenreDesc" Type="nvarchar(max)" />
         </EntityType>
         <EntityType Name="ReadingListItems">
           <Key>
@@ -87,6 +103,16 @@
           <Property Name="Status" Type="nvarchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdatedAt" Type="datetime2" Precision="0" Nullable="false" />
         </EntityType>
+        <EntityType Name="ReadingLists">
+          <Key>
+            <PropertyRef Name="UserId" />
+            <PropertyRef Name="BookId" />
+          </Key>
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="BookId" Type="int" Nullable="false" />
+          <Property Name="ListState" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="AddedAt" Type="datetime" Nullable="false" />
+        </EntityType>
         <EntityType Name="Reviews">
           <Key>
             <PropertyRef Name="ReviewId" />
@@ -94,11 +120,32 @@
           <Property Name="ReviewId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="BookId" Type="int" Nullable="false" />
           <Property Name="UserId" Type="int" Nullable="false" />
-          <Property Name="Rating" Type="tinyint" Nullable="false" />
           <Property Name="ReviewText" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Rating" Type="int" Nullable="false" />
           <Property Name="IsFrozen" Type="bit" Nullable="false" />
-          <Property Name="FreezeReason" Type="nvarchar" MaxLength="500" />
-          <Property Name="CreatedAt" Type="datetime2" Precision="0" Nullable="false" />
+          <Property Name="FreezeReason" Type="nvarchar(max)" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="RoleRequests">
+          <Key>
+            <PropertyRef Name="RequestId" />
+          </Key>
+          <Property Name="RequestId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="RequestedRoleId" Type="int" Nullable="false" />
+          <Property Name="Motivation" Type="nvarchar(max)" />
+          <Property Name="Status" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="ModeratorUserId" Type="int" />
+          <Property Name="DecisionComment" Type="nvarchar(max)" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="DecidedAt" Type="datetime" />
+        </EntityType>
+        <EntityType Name="Roles">
+          <Key>
+            <PropertyRef Name="RoleId" />
+          </Key>
+          <Property Name="RoleId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="RoleName" Type="nvarchar" MaxLength="50" Nullable="false" />
         </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
@@ -109,6 +156,21 @@
           <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="version" Type="int" />
           <Property Name="definition" Type="varbinary(max)" />
+        </EntityType>
+        <EntityType Name="UnfreezeRequests">
+          <Key>
+            <PropertyRef Name="RequestId" />
+          </Key>
+          <Property Name="RequestId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="RequesterUserId" Type="int" Nullable="false" />
+          <Property Name="TargetUserId" Type="int" />
+          <Property Name="TargetBookId" Type="int" />
+          <Property Name="Reason" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Status" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="ModeratorUserId" Type="int" />
+          <Property Name="DecisionComment" Type="nvarchar(max)" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="DecidedAt" Type="datetime" />
         </EntityType>
         <EntityType Name="Users">
           <Key>
@@ -230,6 +292,54 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Complaints_Books">
+          <End Role="Books" Type="Self.Books" Multiplicity="0..1" />
+          <End Role="Complaints" Type="Self.Complaints" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Books">
+              <PropertyRef Name="BookId" />
+            </Principal>
+            <Dependent Role="Complaints">
+              <PropertyRef Name="TargetBookId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Complaints_Moderator">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="Complaints" Type="Self.Complaints" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Complaints">
+              <PropertyRef Name="ModeratorUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Complaints_Reviews">
+          <End Role="Reviews" Type="Self.Reviews" Multiplicity="0..1" />
+          <End Role="Complaints" Type="Self.Complaints" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Reviews">
+              <PropertyRef Name="ReviewId" />
+            </Principal>
+            <Dependent Role="Complaints">
+              <PropertyRef Name="TargetReviewId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Complaints_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Complaints" Type="Self.Complaints" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Complaints">
+              <PropertyRef Name="ComplainerUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_FreezeAppeals_Admins">
           <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
           <End Role="FreezeAppeals" Type="Self.FreezeAppeals" Multiplicity="*" />
@@ -284,6 +394,34 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ReadingLists_Books">
+          <End Role="Books" Type="Self.Books" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ReadingLists" Type="Self.ReadingLists" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Books">
+              <PropertyRef Name="BookId" />
+            </Principal>
+            <Dependent Role="ReadingLists">
+              <PropertyRef Name="BookId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ReadingLists_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ReadingLists" Type="Self.ReadingLists" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="ReadingLists">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Reviews_Books">
           <End Role="Books" Type="Self.Books" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -312,16 +450,109 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_RoleRequests_Moderator">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="RoleRequests" Type="Self.RoleRequests" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="RoleRequests">
+              <PropertyRef Name="ModeratorUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RoleRequests_Roles">
+          <End Role="Roles" Type="Self.Roles" Multiplicity="1" />
+          <End Role="RoleRequests" Type="Self.RoleRequests" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="RoleId" />
+            </Principal>
+            <Dependent Role="RoleRequests">
+              <PropertyRef Name="RequestedRoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RoleRequests_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="RoleRequests" Type="Self.RoleRequests" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="RoleRequests">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UnfreezeRequests_Moderator">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="UnfreezeRequests" Type="Self.UnfreezeRequests" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="UnfreezeRequests">
+              <PropertyRef Name="ModeratorUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UnfreezeRequests_Requester">
+          <End Role="Users" Type="Self.Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="UnfreezeRequests" Type="Self.UnfreezeRequests" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="UnfreezeRequests">
+              <PropertyRef Name="RequesterUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UnfreezeRequests_TargetBook">
+          <End Role="Books" Type="Self.Books" Multiplicity="0..1" />
+          <End Role="UnfreezeRequests" Type="Self.UnfreezeRequests" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Books">
+              <PropertyRef Name="BookId" />
+            </Principal>
+            <Dependent Role="UnfreezeRequests">
+              <PropertyRef Name="TargetBookId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UnfreezeRequests_TargetUser">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="UnfreezeRequests" Type="Self.UnfreezeRequests" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="UnfreezeRequests">
+              <PropertyRef Name="TargetUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="Хранилище UP_Andreev_423ModelContainer">
           <EntitySet Name="AuthorRoleApplications" EntityType="Self.AuthorRoleApplications" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="BookComplaints" EntityType="Self.BookComplaints" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="BookGenres" EntityType="Self.BookGenres" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Books" EntityType="Self.Books" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Complaints" EntityType="Self.Complaints" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FreezeAppeals" EntityType="Self.FreezeAppeals" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Genres" EntityType="Self.Genres" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ReadingListItems" EntityType="Self.ReadingListItems" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ReadingLists" EntityType="Self.ReadingLists" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Reviews" EntityType="Self.Reviews" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="RoleRequests" EntityType="Self.RoleRequests" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Roles" EntityType="Self.Roles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UnfreezeRequests" EntityType="Self.UnfreezeRequests" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_AuthorRoleApplications_Admins" Association="Self.FK_AuthorRoleApplications_Admins">
             <End Role="Users" EntitySet="Users" />
@@ -355,6 +586,22 @@
             <End Role="Users" EntitySet="Users" />
             <End Role="Books" EntitySet="Books" />
           </AssociationSet>
+          <AssociationSet Name="FK_Complaints_Books" Association="Self.FK_Complaints_Books">
+            <End Role="Books" EntitySet="Books" />
+            <End Role="Complaints" EntitySet="Complaints" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Complaints_Moderator" Association="Self.FK_Complaints_Moderator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Complaints" EntitySet="Complaints" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Complaints_Reviews" Association="Self.FK_Complaints_Reviews">
+            <End Role="Reviews" EntitySet="Reviews" />
+            <End Role="Complaints" EntitySet="Complaints" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Complaints_Users" Association="Self.FK_Complaints_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Complaints" EntitySet="Complaints" />
+          </AssociationSet>
           <AssociationSet Name="FK_FreezeAppeals_Admins" Association="Self.FK_FreezeAppeals_Admins">
             <End Role="Users" EntitySet="Users" />
             <End Role="FreezeAppeals" EntitySet="FreezeAppeals" />
@@ -371,6 +618,14 @@
             <End Role="Users" EntitySet="Users" />
             <End Role="ReadingListItems" EntitySet="ReadingListItems" />
           </AssociationSet>
+          <AssociationSet Name="FK_ReadingLists_Books" Association="Self.FK_ReadingLists_Books">
+            <End Role="Books" EntitySet="Books" />
+            <End Role="ReadingLists" EntitySet="ReadingLists" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ReadingLists_Users" Association="Self.FK_ReadingLists_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="ReadingLists" EntitySet="ReadingLists" />
+          </AssociationSet>
           <AssociationSet Name="FK_Reviews_Books" Association="Self.FK_Reviews_Books">
             <End Role="Books" EntitySet="Books" />
             <End Role="Reviews" EntitySet="Reviews" />
@@ -378,6 +633,34 @@
           <AssociationSet Name="FK_Reviews_Users" Association="Self.FK_Reviews_Users">
             <End Role="Users" EntitySet="Users" />
             <End Role="Reviews" EntitySet="Reviews" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RoleRequests_Moderator" Association="Self.FK_RoleRequests_Moderator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="RoleRequests" EntitySet="RoleRequests" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RoleRequests_Roles" Association="Self.FK_RoleRequests_Roles">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="RoleRequests" EntitySet="RoleRequests" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RoleRequests_Users" Association="Self.FK_RoleRequests_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="RoleRequests" EntitySet="RoleRequests" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UnfreezeRequests_Moderator" Association="Self.FK_UnfreezeRequests_Moderator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="UnfreezeRequests" EntitySet="UnfreezeRequests" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UnfreezeRequests_Requester" Association="Self.FK_UnfreezeRequests_Requester">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="UnfreezeRequests" EntitySet="UnfreezeRequests" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UnfreezeRequests_TargetBook" Association="Self.FK_UnfreezeRequests_TargetBook">
+            <End Role="Books" EntitySet="Books" />
+            <End Role="UnfreezeRequests" EntitySet="UnfreezeRequests" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UnfreezeRequests_TargetUser" Association="Self.FK_UnfreezeRequests_TargetUser">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="UnfreezeRequests" EntitySet="UnfreezeRequests" />
           </AssociationSet>
         </EntityContainer>
       </Schema>
@@ -433,9 +716,31 @@
           <Property Name="PublishedAt" Type="DateTime" Nullable="false" Precision="0" />
           <NavigationProperty Name="BookComplaints" Relationship="Self.FK_BookComplaints_Books" FromRole="Books" ToRole="BookComplaints" />
           <NavigationProperty Name="Users" Relationship="Self.FK_Books_Users" FromRole="Books" ToRole="Users" />
+          <NavigationProperty Name="Complaints" Relationship="Self.FK_Complaints_Books" FromRole="Books" ToRole="Complaints" />
           <NavigationProperty Name="ReadingListItems" Relationship="Self.FK_ReadingListItems_Books" FromRole="Books" ToRole="ReadingListItems" />
+          <NavigationProperty Name="ReadingLists" Relationship="Self.FK_ReadingLists_Books" FromRole="Books" ToRole="ReadingLists" />
           <NavigationProperty Name="Reviews" Relationship="Self.FK_Reviews_Books" FromRole="Books" ToRole="Reviews" />
+          <NavigationProperty Name="UnfreezeRequests" Relationship="Self.FK_UnfreezeRequests_TargetBook" FromRole="Books" ToRole="UnfreezeRequests" />
           <NavigationProperty Name="Genres" Relationship="Self.BookGenres" FromRole="Books" ToRole="Genres" />
+        </EntityType>
+        <EntityType Name="Complaints">
+          <Key>
+            <PropertyRef Name="ComplaintId" />
+          </Key>
+          <Property Name="ComplaintId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ComplainerUserId" Type="Int32" Nullable="false" />
+          <Property Name="TargetBookId" Type="Int32" />
+          <Property Name="TargetReviewId" Type="Int32" />
+          <Property Name="Reason" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ModeratorUserId" Type="Int32" />
+          <Property Name="DecisionComment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="DecidedAt" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Books" Relationship="Self.FK_Complaints_Books" FromRole="Complaints" ToRole="Books" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_Complaints_Moderator" FromRole="Complaints" ToRole="Users" />
+          <NavigationProperty Name="Reviews" Relationship="Self.FK_Complaints_Reviews" FromRole="Complaints" ToRole="Reviews" />
+          <NavigationProperty Name="Users1" Relationship="Self.FK_Complaints_Users" FromRole="Complaints" ToRole="Users" />
         </EntityType>
         <EntityType Name="FreezeAppeals">
           <Key>
@@ -459,7 +764,8 @@
             <PropertyRef Name="GenreId" />
           </Key>
           <Property Name="GenreId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="GenreName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="GenreDesc" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Books" Relationship="Self.BookGenres" FromRole="Genres" ToRole="Books" />
         </EntityType>
         <EntityType Name="ReadingListItems">
@@ -474,6 +780,18 @@
           <NavigationProperty Name="Books" Relationship="Self.FK_ReadingListItems_Books" FromRole="ReadingListItems" ToRole="Books" />
           <NavigationProperty Name="Users" Relationship="Self.FK_ReadingListItems_Users" FromRole="ReadingListItems" ToRole="Users" />
         </EntityType>
+        <EntityType Name="ReadingLists">
+          <Key>
+            <PropertyRef Name="UserId" />
+            <PropertyRef Name="BookId" />
+          </Key>
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="BookId" Type="Int32" Nullable="false" />
+          <Property Name="ListState" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="AddedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Books" Relationship="Self.FK_ReadingLists_Books" FromRole="ReadingLists" ToRole="Books" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_ReadingLists_Users" FromRole="ReadingLists" ToRole="Users" />
+        </EntityType>
         <EntityType Name="Reviews">
           <Key>
             <PropertyRef Name="ReviewId" />
@@ -481,13 +799,39 @@
           <Property Name="ReviewId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="BookId" Type="Int32" Nullable="false" />
           <Property Name="UserId" Type="Int32" Nullable="false" />
-          <Property Name="Rating" Type="Byte" Nullable="false" />
           <Property Name="ReviewText" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Rating" Type="Int32" Nullable="false" />
           <Property Name="IsFrozen" Type="Boolean" Nullable="false" />
-          <Property Name="FreezeReason" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="FreezeReason" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="Books" Relationship="Self.FK_Reviews_Books" FromRole="Reviews" ToRole="Books" />
+          <NavigationProperty Name="Complaints" Relationship="Self.FK_Complaints_Reviews" FromRole="Reviews" ToRole="Complaints" />
           <NavigationProperty Name="Users" Relationship="Self.FK_Reviews_Users" FromRole="Reviews" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="RoleRequests">
+          <Key>
+            <PropertyRef Name="RequestId" />
+          </Key>
+          <Property Name="RequestId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="RequestedRoleId" Type="Int32" Nullable="false" />
+          <Property Name="Motivation" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ModeratorUserId" Type="Int32" />
+          <Property Name="DecisionComment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="DecidedAt" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_RoleRequests_Moderator" FromRole="RoleRequests" ToRole="Users" />
+          <NavigationProperty Name="Roles" Relationship="Self.FK_RoleRequests_Roles" FromRole="RoleRequests" ToRole="Roles" />
+          <NavigationProperty Name="Users1" Relationship="Self.FK_RoleRequests_Users" FromRole="RoleRequests" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="Roles">
+          <Key>
+            <PropertyRef Name="RoleId" />
+          </Key>
+          <Property Name="RoleId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RoleName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="RoleRequests" Relationship="Self.FK_RoleRequests_Roles" FromRole="Roles" ToRole="RoleRequests" />
         </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
@@ -498,6 +842,25 @@
           <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="version" Type="Int32" />
           <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="UnfreezeRequests">
+          <Key>
+            <PropertyRef Name="RequestId" />
+          </Key>
+          <Property Name="RequestId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RequesterUserId" Type="Int32" Nullable="false" />
+          <Property Name="TargetUserId" Type="Int32" />
+          <Property Name="TargetBookId" Type="Int32" />
+          <Property Name="Reason" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ModeratorUserId" Type="Int32" />
+          <Property Name="DecisionComment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="DecidedAt" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Books" Relationship="Self.FK_UnfreezeRequests_TargetBook" FromRole="UnfreezeRequests" ToRole="Books" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_UnfreezeRequests_Moderator" FromRole="UnfreezeRequests" ToRole="Users" />
+          <NavigationProperty Name="Users1" Relationship="Self.FK_UnfreezeRequests_Requester" FromRole="UnfreezeRequests" ToRole="Users" />
+          <NavigationProperty Name="Users2" Relationship="Self.FK_UnfreezeRequests_TargetUser" FromRole="UnfreezeRequests" ToRole="Users" />
         </EntityType>
         <EntityType Name="Users">
           <Key>
@@ -517,10 +880,18 @@
           <NavigationProperty Name="BookComplaints" Relationship="Self.FK_BookComplaints_Admins" FromRole="Users" ToRole="BookComplaints" />
           <NavigationProperty Name="BookComplaints1" Relationship="Self.FK_BookComplaints_Users" FromRole="Users" ToRole="BookComplaints" />
           <NavigationProperty Name="Books" Relationship="Self.FK_Books_Users" FromRole="Users" ToRole="Books" />
+          <NavigationProperty Name="Complaints" Relationship="Self.FK_Complaints_Moderator" FromRole="Users" ToRole="Complaints" />
+          <NavigationProperty Name="Complaints1" Relationship="Self.FK_Complaints_Users" FromRole="Users" ToRole="Complaints" />
           <NavigationProperty Name="FreezeAppeals" Relationship="Self.FK_FreezeAppeals_Admins" FromRole="Users" ToRole="FreezeAppeals" />
           <NavigationProperty Name="FreezeAppeals1" Relationship="Self.FK_FreezeAppeals_Users" FromRole="Users" ToRole="FreezeAppeals" />
           <NavigationProperty Name="ReadingListItems" Relationship="Self.FK_ReadingListItems_Users" FromRole="Users" ToRole="ReadingListItems" />
+          <NavigationProperty Name="ReadingLists" Relationship="Self.FK_ReadingLists_Users" FromRole="Users" ToRole="ReadingLists" />
           <NavigationProperty Name="Reviews" Relationship="Self.FK_Reviews_Users" FromRole="Users" ToRole="Reviews" />
+          <NavigationProperty Name="RoleRequests" Relationship="Self.FK_RoleRequests_Moderator" FromRole="Users" ToRole="RoleRequests" />
+          <NavigationProperty Name="RoleRequests1" Relationship="Self.FK_RoleRequests_Users" FromRole="Users" ToRole="RoleRequests" />
+          <NavigationProperty Name="UnfreezeRequests" Relationship="Self.FK_UnfreezeRequests_Moderator" FromRole="Users" ToRole="UnfreezeRequests" />
+          <NavigationProperty Name="UnfreezeRequests1" Relationship="Self.FK_UnfreezeRequests_Requester" FromRole="Users" ToRole="UnfreezeRequests" />
+          <NavigationProperty Name="UnfreezeRequests2" Relationship="Self.FK_UnfreezeRequests_TargetUser" FromRole="Users" ToRole="UnfreezeRequests" />
         </EntityType>
         <Association Name="FK_AuthorRoleApplications_Admins">
           <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
@@ -600,6 +971,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Complaints_Books">
+          <End Role="Books" Type="Self.Books" Multiplicity="0..1" />
+          <End Role="Complaints" Type="Self.Complaints" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Books">
+              <PropertyRef Name="BookId" />
+            </Principal>
+            <Dependent Role="Complaints">
+              <PropertyRef Name="TargetBookId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ReadingListItems_Books">
           <End Role="Books" Type="Self.Books" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -610,6 +993,20 @@
               <PropertyRef Name="BookId" />
             </Principal>
             <Dependent Role="ReadingListItems">
+              <PropertyRef Name="BookId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ReadingLists_Books">
+          <End Role="Books" Type="Self.Books" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ReadingLists" Type="Self.ReadingLists" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Books">
+              <PropertyRef Name="BookId" />
+            </Principal>
+            <Dependent Role="ReadingLists">
               <PropertyRef Name="BookId" />
             </Dependent>
           </ReferentialConstraint>
@@ -625,6 +1022,54 @@
             </Principal>
             <Dependent Role="Reviews">
               <PropertyRef Name="BookId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UnfreezeRequests_TargetBook">
+          <End Role="Books" Type="Self.Books" Multiplicity="0..1" />
+          <End Role="UnfreezeRequests" Type="Self.UnfreezeRequests" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Books">
+              <PropertyRef Name="BookId" />
+            </Principal>
+            <Dependent Role="UnfreezeRequests">
+              <PropertyRef Name="TargetBookId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Complaints_Moderator">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="Complaints" Type="Self.Complaints" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Complaints">
+              <PropertyRef Name="ModeratorUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Complaints_Reviews">
+          <End Role="Reviews" Type="Self.Reviews" Multiplicity="0..1" />
+          <End Role="Complaints" Type="Self.Complaints" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Reviews">
+              <PropertyRef Name="ReviewId" />
+            </Principal>
+            <Dependent Role="Complaints">
+              <PropertyRef Name="TargetReviewId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Complaints_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Complaints" Type="Self.Complaints" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Complaints">
+              <PropertyRef Name="ComplainerUserId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -668,6 +1113,20 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ReadingLists_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ReadingLists" Type="Self.ReadingLists" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="ReadingLists">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Reviews_Users">
           <End Role="Users" Type="Self.Users" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -682,6 +1141,82 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_RoleRequests_Moderator">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="RoleRequests" Type="Self.RoleRequests" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="RoleRequests">
+              <PropertyRef Name="ModeratorUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RoleRequests_Roles">
+          <End Role="Roles" Type="Self.Roles" Multiplicity="1" />
+          <End Role="RoleRequests" Type="Self.RoleRequests" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="RoleId" />
+            </Principal>
+            <Dependent Role="RoleRequests">
+              <PropertyRef Name="RequestedRoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RoleRequests_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="RoleRequests" Type="Self.RoleRequests" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="RoleRequests">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UnfreezeRequests_Moderator">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="UnfreezeRequests" Type="Self.UnfreezeRequests" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="UnfreezeRequests">
+              <PropertyRef Name="ModeratorUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UnfreezeRequests_Requester">
+          <End Role="Users" Type="Self.Users" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="UnfreezeRequests" Type="Self.UnfreezeRequests" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="UnfreezeRequests">
+              <PropertyRef Name="RequesterUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UnfreezeRequests_TargetUser">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="UnfreezeRequests" Type="Self.UnfreezeRequests" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="UnfreezeRequests">
+              <PropertyRef Name="TargetUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="BookGenres">
           <End Role="Books" Type="Self.Books" Multiplicity="*" />
           <End Role="Genres" Type="Self.Genres" Multiplicity="*" />
@@ -690,11 +1225,16 @@
           <EntitySet Name="AuthorRoleApplications" EntityType="Self.AuthorRoleApplications" />
           <EntitySet Name="BookComplaints" EntityType="Self.BookComplaints" />
           <EntitySet Name="Books" EntityType="Self.Books" />
+          <EntitySet Name="Complaints" EntityType="Self.Complaints" />
           <EntitySet Name="FreezeAppeals" EntityType="Self.FreezeAppeals" />
           <EntitySet Name="Genres" EntityType="Self.Genres" />
           <EntitySet Name="ReadingListItems" EntityType="Self.ReadingListItems" />
+          <EntitySet Name="ReadingLists" EntityType="Self.ReadingLists" />
           <EntitySet Name="Reviews" EntityType="Self.Reviews" />
+          <EntitySet Name="RoleRequests" EntityType="Self.RoleRequests" />
+          <EntitySet Name="Roles" EntityType="Self.Roles" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" />
+          <EntitySet Name="UnfreezeRequests" EntityType="Self.UnfreezeRequests" />
           <EntitySet Name="Users" EntityType="Self.Users" />
           <AssociationSet Name="FK_AuthorRoleApplications_Admins" Association="Self.FK_AuthorRoleApplications_Admins">
             <End Role="Users" EntitySet="Users" />
@@ -720,13 +1260,37 @@
             <End Role="Users" EntitySet="Users" />
             <End Role="Books" EntitySet="Books" />
           </AssociationSet>
+          <AssociationSet Name="FK_Complaints_Books" Association="Self.FK_Complaints_Books">
+            <End Role="Books" EntitySet="Books" />
+            <End Role="Complaints" EntitySet="Complaints" />
+          </AssociationSet>
           <AssociationSet Name="FK_ReadingListItems_Books" Association="Self.FK_ReadingListItems_Books">
             <End Role="Books" EntitySet="Books" />
             <End Role="ReadingListItems" EntitySet="ReadingListItems" />
           </AssociationSet>
+          <AssociationSet Name="FK_ReadingLists_Books" Association="Self.FK_ReadingLists_Books">
+            <End Role="Books" EntitySet="Books" />
+            <End Role="ReadingLists" EntitySet="ReadingLists" />
+          </AssociationSet>
           <AssociationSet Name="FK_Reviews_Books" Association="Self.FK_Reviews_Books">
             <End Role="Books" EntitySet="Books" />
             <End Role="Reviews" EntitySet="Reviews" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UnfreezeRequests_TargetBook" Association="Self.FK_UnfreezeRequests_TargetBook">
+            <End Role="Books" EntitySet="Books" />
+            <End Role="UnfreezeRequests" EntitySet="UnfreezeRequests" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Complaints_Moderator" Association="Self.FK_Complaints_Moderator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Complaints" EntitySet="Complaints" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Complaints_Reviews" Association="Self.FK_Complaints_Reviews">
+            <End Role="Reviews" EntitySet="Reviews" />
+            <End Role="Complaints" EntitySet="Complaints" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Complaints_Users" Association="Self.FK_Complaints_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Complaints" EntitySet="Complaints" />
           </AssociationSet>
           <AssociationSet Name="FK_FreezeAppeals_Admins" Association="Self.FK_FreezeAppeals_Admins">
             <End Role="Users" EntitySet="Users" />
@@ -740,9 +1304,37 @@
             <End Role="Users" EntitySet="Users" />
             <End Role="ReadingListItems" EntitySet="ReadingListItems" />
           </AssociationSet>
+          <AssociationSet Name="FK_ReadingLists_Users" Association="Self.FK_ReadingLists_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="ReadingLists" EntitySet="ReadingLists" />
+          </AssociationSet>
           <AssociationSet Name="FK_Reviews_Users" Association="Self.FK_Reviews_Users">
             <End Role="Users" EntitySet="Users" />
             <End Role="Reviews" EntitySet="Reviews" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RoleRequests_Moderator" Association="Self.FK_RoleRequests_Moderator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="RoleRequests" EntitySet="RoleRequests" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RoleRequests_Roles" Association="Self.FK_RoleRequests_Roles">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="RoleRequests" EntitySet="RoleRequests" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RoleRequests_Users" Association="Self.FK_RoleRequests_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="RoleRequests" EntitySet="RoleRequests" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UnfreezeRequests_Moderator" Association="Self.FK_UnfreezeRequests_Moderator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="UnfreezeRequests" EntitySet="UnfreezeRequests" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UnfreezeRequests_Requester" Association="Self.FK_UnfreezeRequests_Requester">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="UnfreezeRequests" EntitySet="UnfreezeRequests" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UnfreezeRequests_TargetUser" Association="Self.FK_UnfreezeRequests_TargetUser">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="UnfreezeRequests" EntitySet="UnfreezeRequests" />
           </AssociationSet>
           <AssociationSet Name="BookGenres" Association="Self.BookGenres">
             <End Role="Books" EntitySet="Books" />
@@ -800,6 +1392,22 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Complaints">
+            <EntityTypeMapping TypeName="UP_Andreev_423Model.Complaints">
+              <MappingFragment StoreEntitySet="Complaints">
+                <ScalarProperty Name="ComplaintId" ColumnName="ComplaintId" />
+                <ScalarProperty Name="ComplainerUserId" ColumnName="ComplainerUserId" />
+                <ScalarProperty Name="TargetBookId" ColumnName="TargetBookId" />
+                <ScalarProperty Name="TargetReviewId" ColumnName="TargetReviewId" />
+                <ScalarProperty Name="Reason" ColumnName="Reason" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="ModeratorUserId" ColumnName="ModeratorUserId" />
+                <ScalarProperty Name="DecisionComment" ColumnName="DecisionComment" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="DecidedAt" ColumnName="DecidedAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="FreezeAppeals">
             <EntityTypeMapping TypeName="UP_Andreev_423Model.FreezeAppeals">
               <MappingFragment StoreEntitySet="FreezeAppeals">
@@ -820,7 +1428,8 @@
             <EntityTypeMapping TypeName="UP_Andreev_423Model.Genres">
               <MappingFragment StoreEntitySet="Genres">
                 <ScalarProperty Name="GenreId" ColumnName="GenreId" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="GenreName" ColumnName="GenreName" />
+                <ScalarProperty Name="GenreDesc" ColumnName="GenreDesc" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -834,17 +1443,50 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="ReadingLists">
+            <EntityTypeMapping TypeName="UP_Andreev_423Model.ReadingLists">
+              <MappingFragment StoreEntitySet="ReadingLists">
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="BookId" ColumnName="BookId" />
+                <ScalarProperty Name="ListState" ColumnName="ListState" />
+                <ScalarProperty Name="AddedAt" ColumnName="AddedAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Reviews">
             <EntityTypeMapping TypeName="UP_Andreev_423Model.Reviews">
               <MappingFragment StoreEntitySet="Reviews">
                 <ScalarProperty Name="ReviewId" ColumnName="ReviewId" />
                 <ScalarProperty Name="BookId" ColumnName="BookId" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="Rating" ColumnName="Rating" />
                 <ScalarProperty Name="ReviewText" ColumnName="ReviewText" />
+                <ScalarProperty Name="Rating" ColumnName="Rating" />
                 <ScalarProperty Name="IsFrozen" ColumnName="IsFrozen" />
                 <ScalarProperty Name="FreezeReason" ColumnName="FreezeReason" />
                 <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RoleRequests">
+            <EntityTypeMapping TypeName="UP_Andreev_423Model.RoleRequests">
+              <MappingFragment StoreEntitySet="RoleRequests">
+                <ScalarProperty Name="RequestId" ColumnName="RequestId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="RequestedRoleId" ColumnName="RequestedRoleId" />
+                <ScalarProperty Name="Motivation" ColumnName="Motivation" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="ModeratorUserId" ColumnName="ModeratorUserId" />
+                <ScalarProperty Name="DecisionComment" ColumnName="DecisionComment" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="DecidedAt" ColumnName="DecidedAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Roles">
+            <EntityTypeMapping TypeName="UP_Andreev_423Model.Roles">
+              <MappingFragment StoreEntitySet="Roles">
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="RoleName" ColumnName="RoleName" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -856,6 +1498,22 @@
                 <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
                 <ScalarProperty Name="version" ColumnName="version" />
                 <ScalarProperty Name="definition" ColumnName="definition" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UnfreezeRequests">
+            <EntityTypeMapping TypeName="UP_Andreev_423Model.UnfreezeRequests">
+              <MappingFragment StoreEntitySet="UnfreezeRequests">
+                <ScalarProperty Name="RequestId" ColumnName="RequestId" />
+                <ScalarProperty Name="RequesterUserId" ColumnName="RequesterUserId" />
+                <ScalarProperty Name="TargetUserId" ColumnName="TargetUserId" />
+                <ScalarProperty Name="TargetBookId" ColumnName="TargetBookId" />
+                <ScalarProperty Name="Reason" ColumnName="Reason" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="ModeratorUserId" ColumnName="ModeratorUserId" />
+                <ScalarProperty Name="DecisionComment" ColumnName="DecisionComment" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="DecidedAt" ColumnName="DecidedAt" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

@@ -7,19 +7,34 @@
     <Grid>
         <TabControl>
             <TabItem Header="Жалобы">
-                <DataGrid AutoGenerateColumns="True" IsReadOnly="True" CanUserAddRows="False"/>
+                <DataGrid x:Name="ComplaintsGrid"
+                          AutoGenerateColumns="True"
+                          IsReadOnly="True"
+                          CanUserAddRows="False"/>
             </TabItem>
             <TabItem Header="Снятие заморозки">
-                <DataGrid AutoGenerateColumns="True" IsReadOnly="True" CanUserAddRows="False"/>
+                <DataGrid x:Name="RequestsGrid"
+                          AutoGenerateColumns="True"
+                          IsReadOnly="True"
+                          CanUserAddRows="False"/>
             </TabItem>
             <TabItem Header="Заявки автора">
-                <DataGrid AutoGenerateColumns="True" IsReadOnly="True" CanUserAddRows="False"/>
+                <DataGrid x:Name="AuthorRequestsGrid"
+                          AutoGenerateColumns="True"
+                          IsReadOnly="True"
+                          CanUserAddRows="False"/>
             </TabItem>
             <TabItem Header="Заморозки">
-                <DataGrid AutoGenerateColumns="True" IsReadOnly="True" CanUserAddRows="False"/>
+                <DataGrid x:Name="FrozenUsersGrid"
+                          AutoGenerateColumns="True"
+                          IsReadOnly="True"
+                          CanUserAddRows="False"/>
             </TabItem>
             <TabItem Header="Пользователи">
-                <DataGrid AutoGenerateColumns="True" IsReadOnly="True" CanUserAddRows="False"/>
+                <DataGrid x:Name="UsersGrid"
+                          AutoGenerateColumns="True"
+                          IsReadOnly="True"
+                          CanUserAddRows="False"/>
             </TabItem>
         </TabControl>
     </Grid>

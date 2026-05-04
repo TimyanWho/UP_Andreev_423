@@ -12,26 +12,22 @@ namespace UP_Andreev_423
     using System;
     using System.Collections.Generic;
     
-    public partial class Reviews
+    public partial class Complaints
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Reviews()
-        {
-            this.Complaints = new HashSet<Complaints>();
-        }
-    
-        public int ReviewId { get; set; }
-        public int BookId { get; set; }
-        public int UserId { get; set; }
-        public string ReviewText { get; set; }
-        public int Rating { get; set; }
-        public bool IsFrozen { get; set; }
-        public string FreezeReason { get; set; }
+        public int ComplaintId { get; set; }
+        public int ComplainerUserId { get; set; }
+        public Nullable<int> TargetBookId { get; set; }
+        public Nullable<int> TargetReviewId { get; set; }
+        public string Reason { get; set; }
+        public string Status { get; set; }
+        public Nullable<int> ModeratorUserId { get; set; }
+        public string DecisionComment { get; set; }
         public System.DateTime CreatedAt { get; set; }
+        public Nullable<System.DateTime> DecidedAt { get; set; }
     
         public virtual Books Books { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Complaints> Complaints { get; set; }
         public virtual Users Users { get; set; }
+        public virtual Reviews Reviews { get; set; }
+        public virtual Users Users1 { get; set; }
     }
 }

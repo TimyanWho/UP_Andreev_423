@@ -12,19 +12,14 @@ namespace UP_Andreev_423
     using System;
     using System.Collections.Generic;
     
-    public partial class Genres
+    public partial class ReadingLists
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Genres()
-        {
-            this.Books = new HashSet<Books>();
-        }
+        public int UserId { get; set; }
+        public int BookId { get; set; }
+        public string ListState { get; set; }
+        public System.DateTime AddedAt { get; set; }
     
-        public int GenreId { get; set; }
-        public string GenreName { get; set; }
-        public string GenreDesc { get; set; }
-    
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Books> Books { get; set; }
+        public virtual Books Books { get; set; }
+        public virtual Users Users { get; set; }
     }
 }

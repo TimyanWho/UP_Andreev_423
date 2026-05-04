@@ -19,7 +19,10 @@
         </Border>
 
         <Border Grid.Row="1" Background="White" CornerRadius="14" Padding="14">
-            <DataGrid AutoGenerateColumns="True" IsReadOnly="True" CanUserAddRows="False"/>
+            <DataGrid x:Name="AuthorBooksGrid"
+                      AutoGenerateColumns="True"
+                      IsReadOnly="True"
+                      CanUserAddRows="False"/>
         </Border>
     </Grid>
 </Page>

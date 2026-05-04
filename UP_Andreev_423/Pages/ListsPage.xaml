@@ -20,17 +20,10 @@
         </Border>
 
         <Border Grid.Row="1" Background="White" CornerRadius="14" Padding="14">
-            <ScrollViewer>
-                <WrapPanel>
-                    <Border Width="180" Height="240" Margin="8" Background="#F8F8F8" CornerRadius="10">
-                        <StackPanel Margin="10">
-                            <TextBlock Text="Книга" FontWeight="Bold"/>
-                            <TextBlock Text="Автор" Foreground="#666"/>
-                            <Button Content="Переместить" Margin="0,12,0,0"/>
-                        </StackPanel>
-                    </Border>
-                </WrapPanel>
-            </ScrollViewer>
+            <DataGrid x:Name="ListsGrid"
+                      AutoGenerateColumns="True"
+                      IsReadOnly="True"
+                      CanUserAddRows="False"/>
         </Border>
     </Grid>
 </Page>

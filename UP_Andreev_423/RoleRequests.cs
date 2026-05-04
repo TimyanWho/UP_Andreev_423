@@ -12,19 +12,20 @@ namespace UP_Andreev_423
     using System;
     using System.Collections.Generic;
     
-    public partial class Genres
+    public partial class RoleRequests
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Genres()
-        {
-            this.Books = new HashSet<Books>();
-        }
+        public int RequestId { get; set; }
+        public int UserId { get; set; }
+        public int RequestedRoleId { get; set; }
+        public string Motivation { get; set; }
+        public string Status { get; set; }
+        public Nullable<int> ModeratorUserId { get; set; }
+        public string DecisionComment { get; set; }
+        public System.DateTime CreatedAt { get; set; }
+        public Nullable<System.DateTime> DecidedAt { get; set; }
     
-        public int GenreId { get; set; }
-        public string GenreName { get; set; }
-        public string GenreDesc { get; set; }
-    
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Books> Books { get; set; }
+        public virtual Users Users { get; set; }
+        public virtual Roles Roles { get; set; }
+        public virtual Users Users1 { get; set; }
     }
 }

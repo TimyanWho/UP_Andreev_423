@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Linq;
+using System.Windows.Controls;
 
 namespace UP_Andreev_423.Pages
 {
@@ -7,6 +8,16 @@ namespace UP_Andreev_423.Pages
         public AdminPage()
         {
             InitializeComponent();
+            Loaded += AdminPage_Loaded;
+        }
+
+        private void AdminPage_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            ComplaintsGrid.ItemsSource = Core.Context.Complaints.ToList();
+            RequestsGrid.ItemsSource = Core.Context.UnfreezeRequests.ToList();
+            AuthorRequestsGrid.ItemsSource = Core.Context.RoleRequests.ToList();
+            FrozenUsersGrid.ItemsSource = Core.Context.Users.ToList();
+            UsersGrid.ItemsSource = Core.Context.Users.ToList();
         }
     }
 }

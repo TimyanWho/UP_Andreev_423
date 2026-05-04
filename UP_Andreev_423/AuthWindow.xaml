@@ -17,13 +17,13 @@
         <Grid Background="#E9EEF6">
             <StackPanel HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Width="360">
+                        Width="390">
                 <TextBlock Text="Читай, Пиши и не спиши"
                            FontSize="30"
                            FontWeight="Bold"
                            TextAlignment="Center"
                            Margin="0,0,0,10"/>
-                <TextBlock Text="Прототип платформы для книг маленьких авторов"
+                <TextBlock Text="Платформер для книг тайни эсс авторов"
                            FontSize="16"
                            TextAlignment="Center"
                            Foreground="#555"/>

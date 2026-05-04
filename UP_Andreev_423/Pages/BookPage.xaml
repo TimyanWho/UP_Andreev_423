@@ -4,39 +4,56 @@
       Title="BookPage"
       Background="#F3F3F3">
 
-    <Grid Margin="0">
+    <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="260"/>
+            <ColumnDefinition Width="280"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <Border Background="White" CornerRadius="14" Padding="14" Margin="0,0,12,0">
             <StackPanel>
-                <Border Height="320" Background="#EAEAEA" CornerRadius="12"/>
-                <Button Content="Добавить в список" Margin="0,12,0,0"/>
-                <Button Content="Жалоба на книгу" Margin="0,8,0,0"/>
-                <Button Content="Жалоба на автора" Margin="0,8,0,0"/>
-                <Button Content="Жалоба на отзыв" Margin="0,8,0,0"/>
-                <Button Content="Заморозить книгу / отзыв" Margin="0,8,0,0"/>
+                <Border Height="360" Background="#F2F2F2" CornerRadius="12" ClipToBounds="True">
+                    <Image x:Name="CoverImage" Stretch="UniformToFill"/>
+                </Border>
+
+                <Button Content="Читать" Height="38" Margin="0,12,0,0" Click="Read_Click"/>
+                <Button Content="Добавить в список" Height="38" Margin="0,8,0,0"/>
+                <Button Content="Жалоба на книгу" Height="38" Margin="0,8,0,0"/>
+                <Button Content="Жалоба на автора" Height="38" Margin="0,8,0,0"/>
+                <Button Content="Жалоба на отзыв" Height="38" Margin="0,8,0,0"/>
+                <Button Content="Заморозить книгу / отзыв" Height="38" Margin="0,8,0,0"/>
             </StackPanel>
         </Border>
 
         <Border Grid.Column="1" Background="White" CornerRadius="14" Padding="14">
-            <ScrollViewer>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <TextBlock Text="Название книги" FontSize="24" FontWeight="Bold"/>
-                    <TextBlock Text="Автор" Margin="0,4,0,0" Foreground="#666"/>
-                    <TextBlock Text="Жанры: ..." Margin="0,4,0,0" Foreground="#666"/>
-                    <TextBlock Text="Рейтинг: 4.8" Margin="0,4,0,12" Foreground="#666"/>
+                    <TextBlock x:Name="TitleText" FontSize="26" FontWeight="Bold"/>
+                    <TextBlock x:Name="AuthorText" FontSize="15" Foreground="#666" Margin="0,4,0,0"/>
+                    <TextBlock x:Name="GenreText" FontSize="15" Foreground="#666" Margin="0,2,0,0"/>
+                    <TextBlock x:Name="RatingText" FontSize="15" Foreground="#444" Margin="0,2,0,12"/>
 
                     <TextBlock Text="Описание" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                    <TextBlock TextWrapping="Wrap" Text="Здесь будет полное описание книги." />
+                    <TextBlock x:Name="DescriptionText" TextWrapping="Wrap"/>
 
                     <TextBlock Text="Текст книги" FontSize="18" FontWeight="SemiBold" Margin="0,20,0,6"/>
-                    <TextBlock TextWrapping="Wrap" Text="Здесь будет полный текст книги для чтения." />
+                    <TextBlock x:Name="ContentPreviewText" TextWrapping="Wrap"/>
 
-                    <TextBlock Text="Отзывы" FontSize="18" FontWeight="SemiBold" Margin="0,20,0,6"/>
-                    <DataGrid Height="200" AutoGenerateColumns="True" IsReadOnly="True" CanUserAddRows="False"/>
+                    <Separator Margin="0,18,0,18"/>
+
+                    <TextBlock Text="Отзывы" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <DataGrid x:Name="ReviewsGrid"
+                              AutoGenerateColumns="True"
+                              IsReadOnly="True"
+                              CanUserAddRows="False"
+                              Height="220"/>
+
+                    <TextBlock Text="Оставить отзыв" FontSize="18" FontWeight="SemiBold" Margin="0,20,0,8"/>
+                    <TextBox x:Name="ReviewTextBox" Height="90" AcceptsReturn="True" TextWrapping="Wrap"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <TextBox x:Name="ReviewRatingBox" Width="80" Text="10"/>
+                        <Button Content="Отправить" Margin="10,0,0,0" Width="110" Click="AddReview_Click"/>
+                    </StackPanel>
                 </StackPanel>
             </ScrollViewer>
         </Border>

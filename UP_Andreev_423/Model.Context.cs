@@ -28,11 +28,16 @@ namespace UP_Andreev_423
         public virtual DbSet<AuthorRoleApplications> AuthorRoleApplications { get; set; }
         public virtual DbSet<BookComplaints> BookComplaints { get; set; }
         public virtual DbSet<Books> Books { get; set; }
+        public virtual DbSet<Complaints> Complaints { get; set; }
         public virtual DbSet<FreezeAppeals> FreezeAppeals { get; set; }
         public virtual DbSet<Genres> Genres { get; set; }
         public virtual DbSet<ReadingListItems> ReadingListItems { get; set; }
+        public virtual DbSet<ReadingLists> ReadingLists { get; set; }
         public virtual DbSet<Reviews> Reviews { get; set; }
+        public virtual DbSet<RoleRequests> RoleRequests { get; set; }
+        public virtual DbSet<Roles> Roles { get; set; }
         public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
+        public virtual DbSet<UnfreezeRequests> UnfreezeRequests { get; set; }
         public virtual DbSet<Users> Users { get; set; }
     }
 }

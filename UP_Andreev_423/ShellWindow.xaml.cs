@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -6,29 +6,53 @@ namespace UP_Andreev_423
 {
     public partial class ShellWindow : Window
     {
-        private readonly string _role;
-        private readonly bool _isAuthor;
-        private readonly bool _isFrozen;
-
-        public ShellWindow(string role, bool isAuthor, bool isFrozen)
+        public ShellWindow()
         {
             InitializeComponent();
-
-            _role = role;
-            _isAuthor = isAuthor;
-            _isFrozen = isFrozen;
-
             Loaded += ShellWindow_Loaded;
         }
 
         private void ShellWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            UserInfoText.Text = $"Роль: {_role}";
-            MainFrame.Navigate(new Pages.CatalogPage());
+            Title = "Читай, Пиши и не спиши";
 
-            AdminButton.Visibility = _role == "Администратор" ? Visibility.Visible : Visibility.Collapsed;
-            AuthorButton.Visibility = _isAuthor ? Visibility.Visible : Visibility.Collapsed;
-            FrozenButton.Visibility = _isFrozen ? Visibility.Visible : Visibility.Collapsed;
+            string displayName = GetString("DisplayName", "Пользователь");
+            string role = GetString("Role", "Читатель");
+            bool isAuthor = GetBool("IsAuthor");
+            bool isFrozen = GetBool("IsFrozen");
+
+            UserInfoText.Text = $"{displayName} | {role}";
+
+            AdminButton.Visibility = role.IndexOf("админ", StringComparison.OrdinalIgnoreCase) >= 0
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+
+            AuthorButton.Visibility = isAuthor || role.IndexOf("автор", StringComparison.OrdinalIgnoreCase) >= 0
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+
+            FrozenButton.Visibility = isFrozen ? Visibility.Visible : Visibility.Collapsed;
+
+            MainFrame.Navigate(new Pages.CatalogPage());
+        }
+
+        public void NavigateToBook(int bookId)
+        {
+            MainFrame.Navigate(new Pages.BookPage(bookId));
+        }
+
+        private string GetString(string key, string fallback)
+        {
+            return Application.Current.Properties.Contains(key) && Application.Current.Properties[key] != null
+                ? Application.Current.Properties[key].ToString()
+                : fallback;
+        }
+
+        private bool GetBool(string key)
+        {
+            return Application.Current.Properties.Contains(key) &&
+                   Application.Current.Properties[key] is bool value &&
+                   value;
         }
 
         private void Nav_Click(object sender, RoutedEventArgs e)
@@ -58,13 +82,18 @@ namespace UP_Andreev_423
 
         private void Frozen_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Аккаунт заморожен. Причина и кнопка оспаривания будут показаны на странице профиля.");
+            string reason = GetString("FreezeReason", "Причина не указана.");
+            MessageBox.Show($"Аккаунт заморожен.\nПричина: {reason}", "Заморозка");
         }
 
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
             new AuthWindow().Show();
             Close();
+        }
+        public void NavigateToReader(int bookId)
+        {
+            MainFrame.Navigate(new Pages.ReaderPage(bookId));
         }
     }
 }
