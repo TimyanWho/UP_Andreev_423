@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data.Entity.Validation;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Windows;
 
@@ -26,9 +25,11 @@ namespace UP_Andreev_423
                 return;
             }
 
-            var user = Core.Context.Users.ToList().FirstOrDefault(u =>
-                string.Equals(GetString(u, "Login", "UserLogin"), login, StringComparison.OrdinalIgnoreCase) &&
-                string.Equals(GetString(u, "Password", "UserPassword"), password, StringComparison.Ordinal));
+            var user = Core.Context.Users
+                .ToList()
+                .FirstOrDefault(u =>
+                    string.Equals(DbUtil.Str(u, "Login", "UserLogin"), login, StringComparison.OrdinalIgnoreCase) &&
+                    DbUtil.Str(u, "Password", "UserPassword") == password);
 
             if (user == null)
             {
@@ -36,18 +37,28 @@ namespace UP_Andreev_423
                 return;
             }
 
-            string roleName = GetString(user, "RoleName", "Role", "RoleTitle");
+            var role = Core.Context.Roles
+                .ToList()
+                .FirstOrDefault(r =>
+                    DbUtil.Int(r, "RoleId", "Id") == DbUtil.Int(user, "RoleId", "IdRole"));
+
+            string roleName = DbUtil.Str(role, "RoleName", "Name", "Title");
             if (string.IsNullOrWhiteSpace(roleName))
                 roleName = "Читатель";
 
+            int userId = DbUtil.Int(user, "UserId", "Id");
+            int roleId = DbUtil.Int(user, "RoleId", "IdRole");
+
             Application.Current.Properties["CurrentUser"] = user;
-            Application.Current.Properties["UserLogin"] = GetString(user, "Login", "UserLogin");
-            Application.Current.Properties["DisplayName"] = GetString(user, "DisplayName", "Name", "FullName", "Nickname", "Login");
-            Application.Current.Properties["Email"] = GetString(user, "Email", "Mail", "EMail");
-            Application.Current.Properties["Role"] = roleName;
+            Application.Current.Properties["UserId"] = userId;
+            Application.Current.Properties["UserLogin"] = DbUtil.Str(user, "Login", "UserLogin");
+            Application.Current.Properties["DisplayName"] = DbUtil.Str(user, "DisplayName", "Name", "FullName", "Nickname", "Login");
+            Application.Current.Properties["Email"] = DbUtil.Str(user, "Email", "Mail", "EMail");
+            Application.Current.Properties["RoleId"] = roleId;
+            Application.Current.Properties["RoleName"] = roleName;
+            Application.Current.Properties["IsFrozen"] = DbUtil.Bool(user, "IsFrozen", "Frozen", "Blocked");
+            Application.Current.Properties["FreezeReason"] = DbUtil.Str(user, "FreezeReason", "Reason", "FreezeReasonText");
             Application.Current.Properties["IsAuthor"] = roleName.IndexOf("автор", StringComparison.OrdinalIgnoreCase) >= 0;
-            Application.Current.Properties["IsFrozen"] = GetBool(user, "IsFrozen", "Frozen", "Blocked");
-            Application.Current.Properties["FreezeReason"] = GetString(user, "FreezeReason", "Reason", "FreezeReasonText");
 
             var shell = new ShellWindow();
             shell.Show();
@@ -70,15 +81,15 @@ namespace UP_Andreev_423
                 return;
             }
 
-            if (Core.Context.Users.ToList().Any(u =>
-                    string.Equals(GetString(u, "Login", "UserLogin"), login, StringComparison.OrdinalIgnoreCase)))
+            var users = Core.Context.Users.ToList();
+
+            if (users.Any(u => DbUtil.Str(u, "Login", "UserLogin").Equals(login, StringComparison.OrdinalIgnoreCase)))
             {
                 MessageBox.Show("Такой логин уже существует.");
                 return;
             }
 
-            if (Core.Context.Users.ToList().Any(u =>
-                    string.Equals(GetString(u, "Email", "Mail", "EMail"), email, StringComparison.OrdinalIgnoreCase)))
+            if (users.Any(u => DbUtil.Str(u, "Email", "Mail", "EMail").Equals(email, StringComparison.OrdinalIgnoreCase)))
             {
                 MessageBox.Show("Такой email уже существует.");
                 return;
@@ -86,19 +97,18 @@ namespace UP_Andreev_423
 
             var newUser = new Users();
 
-            SetValue(newUser, login, "Login", "UserLogin");
-            SetValue(newUser, password, "Password", "UserPassword");
-            SetValue(newUser, email, "Email", "Mail", "EMail");
-            SetValue(newUser, displayName, "DisplayName", "Name", "FullName", "Nickname");
-            SetValue(newUser, "Читатель", "RoleName", "Role", "RoleTitle");
-            SetValue(newUser, false, "IsFrozen", "Frozen", "Blocked");
-            SetValue(newUser, DateTime.Now, "CreatedAt", "CreateDate", "DateCreated");
+            DbUtil.Set(newUser, login, "Login", "UserLogin");
+            DbUtil.Set(newUser, password, "Password", "UserPassword");
+            DbUtil.Set(newUser, email, "Email", "Mail", "EMail");
+            DbUtil.Set(newUser, displayName, "DisplayName", "Name", "FullName", "Nickname");
+            DbUtil.Set(newUser, "Читатель", "RoleName", "Role", "RoleTitle");
+            DbUtil.Set(newUser, false, "IsFrozen", "Frozen", "Blocked");
+            DbUtil.Set(newUser, DateTime.Now, "CreatedAt", "CreateDate", "DateCreated");
 
             try
             {
                 Core.Context.Users.Add(newUser);
                 Core.Context.SaveChanges();
-
                 MessageBox.Show("Пользователь зарегистрирован.");
 
                 RegNameBox.Clear();
@@ -122,73 +132,6 @@ namespace UP_Andreev_423
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Ошибка регистрации");
-            }
-        }
-
-        private static object GetPropertyValue(object obj, params string[] names)
-        {
-            if (obj == null)
-                return null;
-
-            foreach (var name in names)
-            {
-                var prop = obj.GetType().GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-                if (prop != null)
-                    return prop.GetValue(obj);
-            }
-
-            return null;
-        }
-
-        private static string GetString(object obj, params string[] names)
-        {
-            return GetPropertyValue(obj, names)?.ToString() ?? string.Empty;
-        }
-
-        private static bool GetBool(object obj, params string[] names)
-        {
-            var value = GetPropertyValue(obj, names);
-            if (value == null)
-                return false;
-
-            if (value is bool b)
-                return b;
-
-            if (bool.TryParse(value.ToString(), out bool parsedBool))
-                return parsedBool;
-
-            if (int.TryParse(value.ToString(), out int parsedInt))
-                return parsedInt != 0;
-
-            return false;
-        }
-
-        private static void SetValue(object obj, object value, params string[] names)
-        {
-            if (obj == null)
-                return;
-
-            foreach (var name in names)
-            {
-                var prop = obj.GetType().GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-                if (prop != null && prop.CanWrite)
-                {
-                    try
-                    {
-                        if (value == null)
-                        {
-                            prop.SetValue(obj, null);
-                            return;
-                        }
-
-                        var targetType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
-                        prop.SetValue(obj, Convert.ChangeType(value, targetType));
-                        return;
-                    }
-                    catch
-                    {
-                    }
-                }
             }
         }
     }

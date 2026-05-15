@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -16,43 +16,37 @@ namespace UP_Andreev_423.Pages
 
         private void ProfilePage_Loaded(object sender, RoutedEventArgs e)
         {
-            object currentUser = Application.Current.Properties["CurrentUser"];
+            var currentUser = Application.Current.Properties["CurrentUser"] as Users;
             if (currentUser == null)
                 return;
 
-            int userId = GetInt(currentUser, "UserId", "Id", "ID");
-            string displayName = GetString(currentUser, "DisplayName", "Name", "FullName", "Nickname", "Login");
-            string login = GetString(currentUser, "Login", "UserLogin");
-            string email = GetString(currentUser, "Email", "Mail", "EMail");
-            string role = GetString(currentUser, "Role", "RoleName", "RoleTitle");
-            if (string.IsNullOrWhiteSpace(role))
-                role = "Читатель";
+            int userId = DbUtil.Int(currentUser, "UserId", "Id");
 
-            NameValueText.Text = displayName;
-            LoginValueText.Text = login;
-            EmailValueText.Text = email;
-            RoleValueText.Text = role;
+            NameValueText.Text = DbUtil.Str(currentUser, "DisplayName", "Name", "FullName", "Nickname", "Login");
+            LoginValueText.Text = DbUtil.Str(currentUser, "Login", "UserLogin");
+            EmailValueText.Text = DbUtil.Str(currentUser, "Email", "Mail", "EMail");
+            RoleValueText.Text = DbUtil.Str(currentUser, "RoleName", "Role", "RoleTitle");
 
-            bool isFrozen = GetBool(currentUser, "IsFrozen", "Frozen", "Blocked");
-            string reason = GetString(currentUser, "FreezeReason", "Reason", "FreezeReasonText");
-
-            if (isFrozen)
+            if (DbUtil.Bool(currentUser, "IsFrozen", "Frozen", "Blocked"))
             {
                 FrozenBlock.Visibility = Visibility.Visible;
+                string reason = DbUtil.Str(currentUser, "FreezeReason", "Reason", "FreezeReasonText");
                 FrozenReasonText.Text = string.IsNullOrWhiteSpace(reason)
                     ? "Причина заморозки не указана."
                     : $"Причина: {reason}";
             }
 
-            var myReviews = Core.Context.Reviews.ToList()
-                .Where(r => GetInt(r, "UserId", "ReviewerId", "AuthorId") == userId)
+            var reviews = Core.Context.Reviews.ToList();
+
+            var myReviews = reviews
+                .Where(r => DbUtil.Int(r, "UserId", "ReviewerId", "AuthorId") == userId)
                 .Select(r => new ReviewCard
                 {
-                    BookId = GetInt(r, "BookId", "IdBook"),
-                    BookTitle = ResolveBookTitle(GetInt(r, "BookId", "IdBook")),
-                    RatingText = $"Оценка: {GetInt(r, "Rating", "Score")}",
-                    Text = GetString(r, "ReviewText", "Text", "Comment"),
-                    CreatedAt = GetString(r, "CreatedAt", "DateCreated")
+                    BookId = DbUtil.Int(r, "BookId", "IdBook"),
+                    BookTitle = ResolveBookTitle(DbUtil.Int(r, "BookId", "IdBook")),
+                    RatingText = $"Оценка: {DbUtil.Int(r, "Rating", "Score")}",
+                    Text = DbUtil.Str(r, "ReviewText", "Text", "Comment"),
+                    CreatedAt = DbUtil.Str(r, "CreatedAt", "DateCreated")
                 })
                 .ToList();
 
@@ -62,45 +56,56 @@ namespace UP_Andreev_423.Pages
 
         private void SendAuthorRequest_Click(object sender, RoutedEventArgs e)
         {
-            object currentUser = Application.Current.Properties["CurrentUser"];
+            var currentUser = Application.Current.Properties["CurrentUser"] as Users;
             if (currentUser == null)
                 return;
 
-            int userId = GetInt(currentUser, "UserId", "Id", "ID");
-            if (userId == 0)
-                return;
+            int userId = DbUtil.Int(currentUser, "UserId", "Id");
+            string motivation = AuthorRequestReasonBox.Text.Trim();
 
-            string reason = AuthorRequestReasonBox.Text.Trim();
-            if (string.IsNullOrWhiteSpace(reason))
+            if (string.IsNullOrWhiteSpace(motivation))
             {
                 MessageBox.Show("Введите причину заявки.");
                 return;
             }
 
+            var roles = Core.Context.Roles.ToList();
+            var authorRole = roles.FirstOrDefault(r => DbUtil.Str(r, "RoleName", "Name", "Title") == "Автор");
+            if (authorRole == null)
+            {
+                MessageBox.Show("В таблице Roles не найдена роль 'Автор'.");
+                return;
+            }
+
             var request = new RoleRequests();
-            SetValue(request, userId, "UserId", "RequesterUserId");
-            SetValue(request, reason, "Reason", "Motivation", "Comment");
-            SetValue(request, "Новая", "Status");
-            SetValue(request, DateTime.Now, "CreatedAt", "DateCreated");
+            DbUtil.Set(request, userId, "UserId");
+            DbUtil.Set(request, DbUtil.Int(authorRole, "RoleId", "Id"), "RequestedRoleId", "RoleId");
+            DbUtil.Set(request, motivation, "Motivation", "Reason", "Comment");
+            DbUtil.Set(request, "Новая", "Status");
+            DbUtil.Set(request, DateTime.Now, "CreatedAt", "DateCreated");
 
-            Core.Context.RoleRequests.Add(request);
-            Core.Context.SaveChanges();
-
-            MessageBox.Show("Заявка на роль автора отправлена.");
-            AuthorRequestReasonBox.Clear();
+            try
+            {
+                Core.Context.RoleRequests.Add(request);
+                Core.Context.SaveChanges();
+                MessageBox.Show("Заявка на роль автора отправлена.");
+                AuthorRequestReasonBox.Clear();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.InnerException?.InnerException?.Message ?? ex.Message, "Ошибка заявки");
+            }
         }
 
         private void SendUnfreezeRequest_Click(object sender, RoutedEventArgs e)
         {
-            object currentUser = Application.Current.Properties["CurrentUser"];
+            var currentUser = Application.Current.Properties["CurrentUser"] as Users;
             if (currentUser == null)
                 return;
 
-            int userId = GetInt(currentUser, "UserId", "Id", "ID");
-            if (userId == 0)
-                return;
-
+            int userId = DbUtil.Int(currentUser, "UserId", "Id");
             string reason = UnfreezeReasonBox.Text.Trim();
+
             if (string.IsNullOrWhiteSpace(reason))
             {
                 MessageBox.Show("Введите причину обращения.");
@@ -108,17 +113,24 @@ namespace UP_Andreev_423.Pages
             }
 
             var request = new UnfreezeRequests();
-            SetValue(request, userId, "RequesterUserId", "UserId");
-            SetValue(request, userId, "TargetUserId", "FrozenUserId");
-            SetValue(request, reason, "Reason", "Motivation", "Comment");
-            SetValue(request, "Новая", "Status");
-            SetValue(request, DateTime.Now, "CreatedAt", "DateCreated");
+            DbUtil.Set(request, userId, "RequesterUserId", "UserId");
+            DbUtil.Set(request, userId, "TargetUserId", "FrozenUserId");
+            DbUtil.Set(request, null, "TargetBookId", "BookId");
+            DbUtil.Set(request, reason, "Reason", "Motivation", "Comment");
+            DbUtil.Set(request, "Новая", "Status");
+            DbUtil.Set(request, DateTime.Now, "CreatedAt", "DateCreated");
 
-            Core.Context.UnfreezeRequests.Add(request);
-            Core.Context.SaveChanges();
-
-            MessageBox.Show("Обращение на разморозку отправлено.");
-            UnfreezeReasonBox.Clear();
+            try
+            {
+                Core.Context.UnfreezeRequests.Add(request);
+                Core.Context.SaveChanges();
+                MessageBox.Show("Обращение на разморозку отправлено.");
+                UnfreezeReasonBox.Clear();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.InnerException?.InnerException?.Message ?? ex.Message, "Ошибка обращения");
+            }
         }
 
         private void OpenBook_Click(object sender, RoutedEventArgs e)
@@ -132,78 +144,8 @@ namespace UP_Andreev_423.Pages
 
         private static string ResolveBookTitle(int bookId)
         {
-            var book = Core.Context.Books.ToList()
-                .FirstOrDefault(b => GetInt(b, "BookId", "Id") == bookId);
-
-            return GetString(book, "Title", "Name");
-        }
-
-        private static object GetValue(object obj, params string[] names)
-        {
-            if (obj == null) return null;
-
-            foreach (var name in names)
-            {
-                var prop = obj.GetType().GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-                if (prop != null)
-                    return prop.GetValue(obj);
-            }
-
-            return null;
-        }
-
-        private static string GetString(object obj, params string[] names)
-        {
-            return GetValue(obj, names)?.ToString() ?? string.Empty;
-        }
-
-        private static int GetInt(object obj, params string[] names)
-        {
-            var value = GetValue(obj, names);
-            if (value == null) return 0;
-
-            try { return Convert.ToInt32(value); }
-            catch { return 0; }
-        }
-
-        private static bool GetBool(object obj, params string[] names)
-        {
-            var value = GetValue(obj, names);
-            if (value == null) return false;
-
-            if (value is bool b) return b;
-            if (bool.TryParse(value.ToString(), out bool parsedBool)) return parsedBool;
-            if (int.TryParse(value.ToString(), out int parsedInt)) return parsedInt != 0;
-            return false;
-        }
-
-        private static void SetValue(object obj, object value, params string[] names)
-        {
-            if (obj == null)
-                return;
-
-            foreach (var name in names)
-            {
-                var prop = obj.GetType().GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-                if (prop != null && prop.CanWrite)
-                {
-                    try
-                    {
-                        if (value == null)
-                        {
-                            prop.SetValue(obj, null);
-                            return;
-                        }
-
-                        var targetType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
-                        prop.SetValue(obj, Convert.ChangeType(value, targetType));
-                        return;
-                    }
-                    catch
-                    {
-                    }
-                }
-            }
+            var book = Core.Context.Books.FirstOrDefault(b => DbUtil.Int(b, "BookId", "Id") == bookId);
+            return DbUtil.Str(book, "Title", "Name");
         }
 
         public class ReviewCard

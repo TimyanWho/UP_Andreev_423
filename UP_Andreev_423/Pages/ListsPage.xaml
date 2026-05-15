@@ -19,16 +19,14 @@
         </Border>
 
         <TabControl Grid.Row="1">
-
             <TabItem Header="Заброшено">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <ItemsControl x:Name="AbandonedItems">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <WrapPanel />
+                                <WrapPanel/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
-
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border Width="220" Height="330" Margin="8" Background="White" CornerRadius="14" Padding="12" BorderBrush="#E3E3E3" BorderThickness="1">
@@ -36,13 +34,11 @@
                                         <Border Height="170" CornerRadius="10" Background="#F2F2F2" ClipToBounds="True">
                                             <Image Source="{Binding CoverImage}" Stretch="UniformToFill"/>
                                         </Border>
-
                                         <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="15" TextWrapping="Wrap" Margin="0,10,0,4" Height="40"/>
                                         <TextBlock Text="{Binding Author}" Foreground="#666" TextWrapping="Wrap"/>
                                         <TextBlock Text="{Binding Genres}" Foreground="#666" TextWrapping="Wrap" Margin="0,2,0,0"/>
                                         <TextBlock Text="{Binding RatingText}" Foreground="#444" Margin="0,6,0,0"/>
                                         <TextBlock Text="{Binding Status}" Foreground="#0A6" Margin="0,4,0,0"/>
-
                                         <Button Content="Открыть" Margin="0,10,0,0" Tag="{Binding}" Click="OpenBook_Click"/>
                                         <Button Content="Переместить" Margin="0,6,0,0" Tag="{Binding}" Click="MoveStatus_Click"/>
                                     </StackPanel>
@@ -58,10 +54,9 @@
                     <ItemsControl x:Name="PlanItems">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <WrapPanel />
+                                <WrapPanel/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
-
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border Width="220" Height="330" Margin="8" Background="White" CornerRadius="14" Padding="12" BorderBrush="#E3E3E3" BorderThickness="1">
@@ -69,13 +64,11 @@
                                         <Border Height="170" CornerRadius="10" Background="#F2F2F2" ClipToBounds="True">
                                             <Image Source="{Binding CoverImage}" Stretch="UniformToFill"/>
                                         </Border>
-
                                         <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="15" TextWrapping="Wrap" Margin="0,10,0,4" Height="40"/>
                                         <TextBlock Text="{Binding Author}" Foreground="#666" TextWrapping="Wrap"/>
                                         <TextBlock Text="{Binding Genres}" Foreground="#666" TextWrapping="Wrap" Margin="0,2,0,0"/>
                                         <TextBlock Text="{Binding RatingText}" Foreground="#444" Margin="0,6,0,0"/>
                                         <TextBlock Text="{Binding Status}" Foreground="#0A6" Margin="0,4,0,0"/>
-
                                         <Button Content="Открыть" Margin="0,10,0,0" Tag="{Binding}" Click="OpenBook_Click"/>
                                         <Button Content="Переместить" Margin="0,6,0,0" Tag="{Binding}" Click="MoveStatus_Click"/>
                                     </StackPanel>
@@ -91,10 +84,9 @@
                     <ItemsControl x:Name="ReadingItems">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <WrapPanel />
+                                <WrapPanel/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
-
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border Width="220" Height="330" Margin="8" Background="White" CornerRadius="14" Padding="12" BorderBrush="#E3E3E3" BorderThickness="1">
@@ -102,13 +94,11 @@
                                         <Border Height="170" CornerRadius="10" Background="#F2F2F2" ClipToBounds="True">
                                             <Image Source="{Binding CoverImage}" Stretch="UniformToFill"/>
                                         </Border>
-
                                         <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="15" TextWrapping="Wrap" Margin="0,10,0,4" Height="40"/>
                                         <TextBlock Text="{Binding Author}" Foreground="#666" TextWrapping="Wrap"/>
                                         <TextBlock Text="{Binding Genres}" Foreground="#666" TextWrapping="Wrap" Margin="0,2,0,0"/>
                                         <TextBlock Text="{Binding RatingText}" Foreground="#444" Margin="0,6,0,0"/>
                                         <TextBlock Text="{Binding Status}" Foreground="#0A6" Margin="0,4,0,0"/>
-
                                         <Button Content="Открыть" Margin="0,10,0,0" Tag="{Binding}" Click="OpenBook_Click"/>
                                         <Button Content="Переместить" Margin="0,6,0,0" Tag="{Binding}" Click="MoveStatus_Click"/>
                                     </StackPanel>
@@ -124,10 +114,9 @@
                     <ItemsControl x:Name="FinishedItems">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <WrapPanel />
+                                <WrapPanel/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
-
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border Width="220" Height="330" Margin="8" Background="White" CornerRadius="14" Padding="12" BorderBrush="#E3E3E3" BorderThickness="1">
@@ -135,13 +124,11 @@
                                         <Border Height="170" CornerRadius="10" Background="#F2F2F2" ClipToBounds="True">
                                             <Image Source="{Binding CoverImage}" Stretch="UniformToFill"/>
                                         </Border>
-
                                         <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="15" TextWrapping="Wrap" Margin="0,10,0,4" Height="40"/>
                                         <TextBlock Text="{Binding Author}" Foreground="#666" TextWrapping="Wrap"/>
                                         <TextBlock Text="{Binding Genres}" Foreground="#666" TextWrapping="Wrap" Margin="0,2,0,0"/>
                                         <TextBlock Text="{Binding RatingText}" Foreground="#444" Margin="0,6,0,0"/>
                                         <TextBlock Text="{Binding Status}" Foreground="#0A6" Margin="0,4,0,0"/>
-
                                         <Button Content="Открыть" Margin="0,10,0,0" Tag="{Binding}" Click="OpenBook_Click"/>
                                         <Button Content="Переместить" Margin="0,6,0,0" Tag="{Binding}" Click="MoveStatus_Click"/>
                                     </StackPanel>
@@ -151,7 +138,6 @@
                     </ItemsControl>
                 </ScrollViewer>
             </TabItem>
-
         </TabControl>
     </Grid>
 </Page>

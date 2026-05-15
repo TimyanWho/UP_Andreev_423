@@ -17,24 +17,29 @@ namespace UP_Andreev_423
             Title = "Читай, Пиши и не спиши";
 
             string displayName = GetString("DisplayName", "Пользователь");
-            string role = GetString("Role", "Читатель");
-            bool isAuthor = GetBool("IsAuthor");
+            string roleName = GetString("RoleName", "Читатель");
+            int roleId = GetInt("RoleId", 0);
             bool isFrozen = GetBool("IsFrozen");
+            bool isAuthor = GetBool("IsAuthor");
+            string login = GetString("UserLogin", "");
 
-            UserInfoText.Text = $"{displayName} | {role}";
+            UserInfoText.Text = $"{displayName} | {roleName}";
 
-            AdminButton.Visibility = role.IndexOf("админ", StringComparison.OrdinalIgnoreCase) >= 0
+            bool isAdmin =
+                roleId == 3 ||
+                roleName.Equals("Администратор", StringComparison.OrdinalIgnoreCase) ||
+                roleName.Equals("Admin", StringComparison.OrdinalIgnoreCase) ||
+                login.Equals("admin", StringComparison.OrdinalIgnoreCase);
+
+            AdminButton.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
+            AuthorButton.Visibility = isAuthor || roleId == 2 || roleName.Equals("Автор", StringComparison.OrdinalIgnoreCase)
                 ? Visibility.Visible
                 : Visibility.Collapsed;
-
-            AuthorButton.Visibility = isAuthor || role.IndexOf("автор", StringComparison.OrdinalIgnoreCase) >= 0
-                ? Visibility.Visible
-                : Visibility.Collapsed;
-
             FrozenButton.Visibility = isFrozen ? Visibility.Visible : Visibility.Collapsed;
 
             MainFrame.Navigate(new Pages.CatalogPage());
         }
+
 
         public void NavigateToBook(int bookId)
         {
@@ -48,29 +53,18 @@ namespace UP_Andreev_423
 
         private void OpenAdmin_Click(object sender, RoutedEventArgs e)
         {
-            string role = GetString("Role", "Читатель");
-            if (role.IndexOf("админ", StringComparison.OrdinalIgnoreCase) < 0)
+            bool isAdmin =
+                GetInt("RoleId", 0) == 3 ||
+                GetString("RoleName", "").Equals("Администратор", StringComparison.OrdinalIgnoreCase) ||
+                GetString("UserLogin", "").Equals("admin", StringComparison.OrdinalIgnoreCase);
+
+            if (!isAdmin)
             {
                 MessageBox.Show("Доступно только администратору.");
                 return;
             }
 
-            var win = new AdminWindow();
-            win.Show();
-        }
-
-        private string GetString(string key, string fallback)
-        {
-            return Application.Current.Properties.Contains(key) && Application.Current.Properties[key] != null
-                ? Application.Current.Properties[key].ToString()
-                : fallback;
-        }
-
-        private bool GetBool(string key)
-        {
-            return Application.Current.Properties.Contains(key) &&
-                   Application.Current.Properties[key] is bool value &&
-                   value;
+            MainFrame.Navigate(new Pages.AdminPage());
         }
 
         private void Nav_Click(object sender, RoutedEventArgs e)
@@ -105,6 +99,30 @@ namespace UP_Andreev_423
         {
             new AuthWindow().Show();
             Close();
+        }
+
+        private string GetString(string key, string fallback)
+        {
+            return Application.Current.Properties.Contains(key) && Application.Current.Properties[key] != null
+                ? Application.Current.Properties[key].ToString()
+                : fallback;
+        }
+
+        private int GetInt(string key, int fallback)
+        {
+            if (Application.Current.Properties.Contains(key) && Application.Current.Properties[key] != null)
+            {
+                try { return Convert.ToInt32(Application.Current.Properties[key]); }
+                catch { }
+            }
+            return fallback;
+        }
+
+        private bool GetBool(string key)
+        {
+            return Application.Current.Properties.Contains(key) &&
+                   Application.Current.Properties[key] is bool value &&
+                   value;
         }
     }
 }
