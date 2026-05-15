@@ -101,10 +101,10 @@ namespace UP_Andreev_423.Pages
 
         private void OpenBook_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.Tag is BookCard card)
+            if (sender is Button btn && btn.Tag is int bookId)
             {
                 var shell = Window.GetWindow(this) as ShellWindow;
-                shell?.NavigateToBook(card.BookId);
+                shell?.NavigateToBook(bookId);
             }
         }
 
@@ -116,21 +116,20 @@ namespace UP_Andreev_423.Pages
                 return;
             }
 
-            if (sender is Button btn && btn.Tag is BookCard card)
+            if (sender is Button btn && btn.Tag is int bookId)
             {
                 var lists = Core.Context.ReadingLists.ToList();
                 var entry = lists.FirstOrDefault(x =>
                     DbUtil.Int(x, "UserId", "OwnerId") == DbUtil.Int(currentUser, "UserId", "Id") &&
-                    DbUtil.Int(x, "BookId", "IdBook") == card.BookId);
+                    DbUtil.Int(x, "BookId", "IdBook") == bookId);
 
                 if (entry == null)
                 {
                     entry = new ReadingLists();
                     DbUtil.Set(entry, DbUtil.Int(currentUser, "UserId", "Id"), "UserId", "OwnerId");
-                    DbUtil.Set(entry, card.BookId, "BookId", "IdBook");
+                    DbUtil.Set(entry, bookId, "BookId", "IdBook");
                     DbUtil.Set(entry, "В планах", "ListState", "Status");
                     DbUtil.Set(entry, DateTime.Now, "AddedAt", "CreatedAt");
-
                     Core.Context.ReadingLists.Add(entry);
                 }
                 else

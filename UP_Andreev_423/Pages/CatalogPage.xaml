@@ -39,8 +39,8 @@
                                 <TextBlock Text="{Binding Genres}" Foreground="#666" TextWrapping="Wrap" Margin="0,2,0,0"/>
                                 <TextBlock Text="{Binding RatingText}" Foreground="#444" Margin="0,6,0,0"/>
 
-                                <Button Content="Открыть" Margin="0,10,0,0" Tag="{Binding}" Click="OpenBook_Click"/>
-                                <Button Content="В список" Margin="0,6,0,0" Tag="{Binding}" Click="AddToList_Click"/>
+                                <Button Content="Открыть" Margin="0,10,0,0" Tag="{Binding BookId}" Click="OpenBook_Click"/>
+                                <Button Content="В список" Margin="0,6,0,0" Tag="{Binding BookId}" Click="AddToList_Click"/>
                             </StackPanel>
                         </Border>
                     </DataTemplate>
