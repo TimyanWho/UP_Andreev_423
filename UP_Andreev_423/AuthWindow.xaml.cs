@@ -27,8 +27,8 @@ namespace UP_Andreev_423
             }
 
             var user = Core.Context.Users.ToList().FirstOrDefault(u =>
-                string.Equals(GetString(u, "Login", "UserLogin", "Логин"), login, StringComparison.OrdinalIgnoreCase) &&
-                string.Equals(GetString(u, "Password", "UserPassword", "Пароль"), password, StringComparison.Ordinal));
+                string.Equals(GetString(u, "Login", "UserLogin"), login, StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(GetString(u, "Password", "UserPassword"), password, StringComparison.Ordinal));
 
             if (user == null)
             {
@@ -36,7 +36,9 @@ namespace UP_Andreev_423
                 return;
             }
 
-            string roleName = ResolveRoleName(user);
+            string roleName = GetString(user, "RoleName", "Role", "RoleTitle");
+            if (string.IsNullOrWhiteSpace(roleName))
+                roleName = "Читатель";
 
             Application.Current.Properties["CurrentUser"] = user;
             Application.Current.Properties["UserLogin"] = GetString(user, "Login", "UserLogin");
@@ -82,36 +84,21 @@ namespace UP_Andreev_423
                 return;
             }
 
-            var readerRole = Core.Context.Roles.ToList()
-                .FirstOrDefault(r => string.Equals(GetString(r, "Name", "RoleName", "Title"), "Читатель", StringComparison.OrdinalIgnoreCase));
-
-            if (readerRole == null)
-            {
-                MessageBox.Show("В таблице ролей не найдена роль 'Читатель'.");
-                return;
-            }
-
             var newUser = new Users();
 
             SetValue(newUser, login, "Login", "UserLogin");
             SetValue(newUser, password, "Password", "UserPassword");
             SetValue(newUser, email, "Email", "Mail", "EMail");
             SetValue(newUser, displayName, "DisplayName", "Name", "FullName", "Nickname");
+            SetValue(newUser, "Читатель", "RoleName", "Role", "RoleTitle");
             SetValue(newUser, false, "IsFrozen", "Frozen", "Blocked");
             SetValue(newUser, DateTime.Now, "CreatedAt", "CreateDate", "DateCreated");
-
-            int roleId = GetInt(readerRole, "Id", "RoleId", "RoleID");
-            if (roleId != 0)
-            {
-                SetValue(newUser, roleId, "RoleId", "RoleID", "IdRole", "Role");
-            }
-
-            SetValue(newUser, readerRole, "Role", "Roles", "RoleNavigation");
 
             try
             {
                 Core.Context.Users.Add(newUser);
                 Core.Context.SaveChanges();
+
                 MessageBox.Show("Пользователь зарегистрирован.");
 
                 RegNameBox.Clear();
@@ -138,37 +125,6 @@ namespace UP_Andreev_423
             }
         }
 
-        private static string ResolveRoleName(object user)
-        {
-            if (user == null)
-                return "Читатель";
-
-            object roleNavigation = GetPropertyValue(user, "Role", "Roles", "RoleNavigation", "Role1");
-            if (roleNavigation != null && !(roleNavigation is string))
-            {
-                string navName = GetString(roleNavigation, "Name", "RoleName", "Title");
-                if (!string.IsNullOrWhiteSpace(navName))
-                    return navName;
-            }
-
-            int roleId = GetInt(user, "RoleId", "RoleID", "IdRole", "Role");
-            if (roleId != 0)
-            {
-                var role = Core.Context.Roles.ToList()
-                    .FirstOrDefault(r => GetInt(r, "Id", "RoleId", "RoleID") == roleId);
-
-                string roleName = GetString(role, "Name", "RoleName", "Title");
-                if (!string.IsNullOrWhiteSpace(roleName))
-                    return roleName;
-            }
-
-            string directRole = GetString(user, "Role", "RoleName", "Title");
-            if (!string.IsNullOrWhiteSpace(directRole))
-                return directRole;
-
-            return "Читатель";
-        }
-
         private static object GetPropertyValue(object obj, params string[] names)
         {
             if (obj == null)
@@ -186,24 +142,7 @@ namespace UP_Andreev_423
 
         private static string GetString(object obj, params string[] names)
         {
-            var value = GetPropertyValue(obj, names);
-            return value?.ToString() ?? string.Empty;
-        }
-
-        private static int GetInt(object obj, params string[] names)
-        {
-            var value = GetPropertyValue(obj, names);
-            if (value == null)
-                return 0;
-
-            try
-            {
-                return Convert.ToInt32(value);
-            }
-            catch
-            {
-                return 0;
-            }
+            return GetPropertyValue(obj, names)?.ToString() ?? string.Empty;
         }
 
         private static bool GetBool(object obj, params string[] names)

@@ -41,6 +41,24 @@ namespace UP_Andreev_423
             MainFrame.Navigate(new Pages.BookPage(bookId));
         }
 
+        public void NavigateToReader(int bookId)
+        {
+            MainFrame.Navigate(new Pages.ReaderPage(bookId));
+        }
+
+        private void OpenAdmin_Click(object sender, RoutedEventArgs e)
+        {
+            string role = GetString("Role", "Читатель");
+            if (role.IndexOf("админ", StringComparison.OrdinalIgnoreCase) < 0)
+            {
+                MessageBox.Show("Доступно только администратору.");
+                return;
+            }
+
+            var win = new AdminWindow();
+            win.Show();
+        }
+
         private string GetString(string key, string fallback)
         {
             return Application.Current.Properties.Contains(key) && Application.Current.Properties[key] != null
@@ -73,9 +91,6 @@ namespace UP_Andreev_423
                     case "Author":
                         MainFrame.Navigate(new Pages.AuthorPage());
                         break;
-                    case "Admin":
-                        MainFrame.Navigate(new Pages.AdminPage());
-                        break;
                 }
             }
         }
@@ -90,10 +105,6 @@ namespace UP_Andreev_423
         {
             new AuthWindow().Show();
             Close();
-        }
-        public void NavigateToReader(int bookId)
-        {
-            MainFrame.Navigate(new Pages.ReaderPage(bookId));
         }
     }
 }

@@ -21,7 +21,7 @@
                 <Button Content="Жалоба на книгу" Height="38" Margin="0,8,0,0"/>
                 <Button Content="Жалоба на автора" Height="38" Margin="0,8,0,0"/>
                 <Button Content="Жалоба на отзыв" Height="38" Margin="0,8,0,0"/>
-                <Button Content="Заморозить книгу / отзыв" Height="38" Margin="0,8,0,0"/>
+                <Button x:Name="AdminFreezeButton" Content="Заморозить книгу / отзыв" Height="38" Margin="0,8,0,0"/>
             </StackPanel>
         </Border>
 

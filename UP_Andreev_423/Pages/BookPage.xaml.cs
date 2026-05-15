@@ -26,6 +26,14 @@ namespace UP_Andreev_423.Pages
         private void BookPage_Loaded(object sender, RoutedEventArgs e)
         {
             LoadBook();
+
+            string role = Application.Current.Properties.Contains("Role")
+                ? Application.Current.Properties["Role"]?.ToString() ?? ""
+                : "";
+
+            AdminFreezeButton.Visibility = role.IndexOf("админ", StringComparison.OrdinalIgnoreCase) >= 0
+                ? Visibility.Visible
+                : Visibility.Collapsed;
         }
 
         private void LoadBook()
@@ -48,7 +56,6 @@ namespace UP_Andreev_423.Pages
             RatingText.Text = $"Рейтинг: {ResolveRating(reviews, _bookId):0.00}";
             DescriptionText.Text = GetString(book, "Description", "Desc", "BookDescription");
             ContentPreviewText.Text = GetString(book, "ContentText", "TextContent", "BookText", "Content");
-
             CoverImage.Source = LoadImage(GetString(book, "CoverPath", "Cover", "ImagePath"));
 
             ReviewsGrid.ItemsSource = reviews
@@ -113,19 +120,19 @@ namespace UP_Andreev_423.Pages
             LoadBook();
         }
 
-        private string ResolveAuthorName(IEnumerable<object> users, int authorId)
+        private static string ResolveAuthorName(IEnumerable<object> users, int authorId)
         {
             var user = users.FirstOrDefault(u => GetInt(u, "UserId", "Id", "ID") == authorId);
             return GetString(user, "DisplayName", "Name", "FullName", "Nickname", "Login");
         }
 
-        private string ResolveUserName(IEnumerable<object> users, int userId)
+        private static string ResolveUserName(IEnumerable<object> users, int userId)
         {
             var user = users.FirstOrDefault(u => GetInt(u, "UserId", "Id", "ID") == userId);
             return GetString(user, "DisplayName", "Name", "FullName", "Nickname", "Login");
         }
 
-        private string ResolveGenres(object book)
+        private static string ResolveGenres(object book)
         {
             var nav = GetValue(book, "Genres", "Genre", "BookGenres", "Genres1");
             if (nav is IEnumerable enumerable)

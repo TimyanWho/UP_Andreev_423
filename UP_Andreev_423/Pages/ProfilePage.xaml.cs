@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
@@ -25,10 +24,9 @@ namespace UP_Andreev_423.Pages
             string displayName = GetString(currentUser, "DisplayName", "Name", "FullName", "Nickname", "Login");
             string login = GetString(currentUser, "Login", "UserLogin");
             string email = GetString(currentUser, "Email", "Mail", "EMail");
-            string role = GetString(currentUser, "Role", "RoleName", "Title");
-
+            string role = GetString(currentUser, "Role", "RoleName", "RoleTitle");
             if (string.IsNullOrWhiteSpace(role))
-                role = ResolveRoleName(currentUser);
+                role = "Читатель";
 
             NameValueText.Text = displayName;
             LoginValueText.Text = login;
@@ -46,16 +44,20 @@ namespace UP_Andreev_423.Pages
                     : $"Причина: {reason}";
             }
 
-            UserReviewsGrid.ItemsSource = Core.Context.Reviews.ToList()
+            var myReviews = Core.Context.Reviews.ToList()
                 .Where(r => GetInt(r, "UserId", "ReviewerId", "AuthorId") == userId)
-                .Select(r => new
+                .Select(r => new ReviewCard
                 {
-                    Book = ResolveBookTitle(GetInt(r, "BookId", "IdBook")),
-                    Rating = GetInt(r, "Rating", "Score"),
+                    BookId = GetInt(r, "BookId", "IdBook"),
+                    BookTitle = ResolveBookTitle(GetInt(r, "BookId", "IdBook")),
+                    RatingText = $"Оценка: {GetInt(r, "Rating", "Score")}",
                     Text = GetString(r, "ReviewText", "Text", "Comment"),
                     CreatedAt = GetString(r, "CreatedAt", "DateCreated")
                 })
                 .ToList();
+
+            ProfileStatsText.Text = $"Мои отзывы: {myReviews.Count}";
+            UserReviewsItems.ItemsSource = myReviews;
         }
 
         private void SendAuthorRequest_Click(object sender, RoutedEventArgs e)
@@ -75,14 +77,9 @@ namespace UP_Andreev_423.Pages
                 return;
             }
 
-            var authorRole = Core.Context.Roles.ToList()
-                .FirstOrDefault(r => string.Equals(GetString(r, "Name", "RoleName", "Title"), "Автор", StringComparison.OrdinalIgnoreCase));
-
             var request = new RoleRequests();
             SetValue(request, userId, "UserId", "RequesterUserId");
-            if (authorRole != null)
-                SetValue(request, GetInt(authorRole, "Id", "RoleId", "RoleID"), "RequestedRoleId", "RoleId");
-            SetValue(request, reason, "Motivation", "Reason", "Comment");
+            SetValue(request, reason, "Reason", "Motivation", "Comment");
             SetValue(request, "Новая", "Status");
             SetValue(request, DateTime.Now, "CreatedAt", "DateCreated");
 
@@ -124,13 +121,13 @@ namespace UP_Andreev_423.Pages
             UnfreezeReasonBox.Clear();
         }
 
-        private static string ResolveRoleName(object user)
+        private void OpenBook_Click(object sender, RoutedEventArgs e)
         {
-            int roleId = GetInt(user, "RoleId", "RoleID", "IdRole");
-            var role = Core.Context.Roles.ToList()
-                .FirstOrDefault(r => GetInt(r, "Id", "RoleId", "RoleID") == roleId);
-
-            return GetString(role, "Name", "RoleName", "Title");
+            if (sender is Button btn && btn.Tag is ReviewCard card)
+            {
+                var shell = Window.GetWindow(this) as ShellWindow;
+                shell?.NavigateToBook(card.BookId);
+            }
         }
 
         private static string ResolveBookTitle(int bookId)
@@ -207,6 +204,15 @@ namespace UP_Andreev_423.Pages
                     }
                 }
             }
+        }
+
+        public class ReviewCard
+        {
+            public int BookId { get; set; }
+            public string BookTitle { get; set; }
+            public string RatingText { get; set; }
+            public string Text { get; set; }
+            public string CreatedAt { get; set; }
         }
     }
 }

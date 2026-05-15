@@ -27,10 +27,15 @@
         </Grid.ColumnDefinitions>
 
         <Border Grid.Column="0" Background="#202430">
-            <StackPanel VerticalAlignment="Top" Margin="0,14,0,0">
+            <StackPanel VerticalAlignment="Top" Margin="0,14,0,0" Cursor="">
                 <Button Content="📚" Style="{StaticResource SideButtonStyle}" Tag="Catalog" ToolTip="Каталог книг" Click="Nav_Click"/>
                 <Button Content="🗂" Style="{StaticResource SideButtonStyle}" Tag="Lists" ToolTip="Списки книг" Click="Nav_Click"/>
-                <Button x:Name="AdminButton" Content="🛡" Style="{StaticResource SideButtonStyle}" Tag="Admin" ToolTip="Администрирование" Click="Nav_Click"/>
+                <Button x:Name="AdminButton"
+        Content="🛡"
+        Style="{StaticResource SideButtonStyle}"
+        Tag="Admin"
+        ToolTip="Администрирование"
+        Click="OpenAdmin_Click"/>
                 <Button x:Name="AuthorButton" Content="✍" Style="{StaticResource SideButtonStyle}" Tag="Author" ToolTip="Страница автора" Click="Nav_Click"/>
                 <Button x:Name="FrozenButton" Content="⚠" Style="{StaticResource SideButtonStyle}" ToolTip="Аккаунт заморожен" Click="Frozen_Click"/>
                 <Button Content="👤" Style="{StaticResource SideButtonStyle}" Tag="Profile" ToolTip="Профиль" Click="Nav_Click"/>
