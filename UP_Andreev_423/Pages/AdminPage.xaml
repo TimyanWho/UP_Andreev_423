@@ -4,37 +4,205 @@
       Title="AdminPage"
       Background="#F3F3F3">
 
+    <Page.Resources>
+        <DataTemplate x:Key="ComplaintCardTemplate">
+            <Border Margin="8" Padding="12" Background="White" CornerRadius="14" BorderBrush="#E3E3E3" BorderThickness="1" Width="320">
+                <StackPanel>
+                    <TextBlock Text="{Binding TargetTitle}" FontWeight="Bold" FontSize="15" TextWrapping="Wrap"/>
+                    <TextBlock Text="{Binding TargetType}" Foreground="#666" Margin="0,4,0,0"/>
+                    <TextBlock Text="{Binding Reason}" TextWrapping="Wrap" Margin="0,8,0,0"/>
+                    <TextBlock Text="{Binding Status}" Foreground="#0A6" Margin="0,8,0,0"/>
+                    <TextBlock Text="{Binding CreatedAt}" Foreground="#666" Margin="0,4,0,0"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                        <Button Content="Принять" Width="90" Margin="0,0,8,0" Click="AcceptComplaint_Click" Tag="{Binding}"/>
+                        <Button Content="Отклонить" Width="90" Click="RejectComplaint_Click" Tag="{Binding}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="RoleRequestCardTemplate">
+            <Border Margin="8" Padding="12" Background="White" CornerRadius="14" BorderBrush="#E3E3E3" BorderThickness="1" Width="320">
+                <StackPanel>
+                    <TextBlock Text="{Binding UserLogin}" FontWeight="Bold" FontSize="15"/>
+                    <TextBlock Text="{Binding RequestedRole}" Foreground="#666" Margin="0,4,0,0"/>
+                    <TextBlock Text="{Binding Motivation}" TextWrapping="Wrap" Margin="0,8,0,0"/>
+                    <TextBlock Text="{Binding Status}" Foreground="#0A6" Margin="0,8,0,0"/>
+                    <TextBlock Text="{Binding CreatedAt}" Foreground="#666" Margin="0,4,0,0"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                        <Button Content="Принять" Width="90" Margin="0,0,8,0" Click="AcceptRoleRequest_Click" Tag="{Binding}"/>
+                        <Button Content="Отклонить" Width="90" Click="RejectRoleRequest_Click" Tag="{Binding}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="UnfreezeRequestCardTemplate">
+            <Border Margin="8" Padding="12" Background="White" CornerRadius="14" BorderBrush="#E3E3E3" BorderThickness="1" Width="320">
+                <StackPanel>
+                    <TextBlock Text="{Binding RequesterLogin}" FontWeight="Bold" FontSize="15"/>
+                    <TextBlock Text="{Binding TargetName}" Foreground="#666" Margin="0,4,0,0"/>
+                    <TextBlock Text="{Binding Reason}" TextWrapping="Wrap" Margin="0,8,0,0"/>
+                    <TextBlock Text="{Binding Status}" Foreground="#0A6" Margin="0,8,0,0"/>
+                    <TextBlock Text="{Binding CreatedAt}" Foreground="#666" Margin="0,4,0,0"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                        <Button Content="Принять" Width="90" Margin="0,0,8,0" Click="AcceptUnfreezeRequest_Click" Tag="{Binding}"/>
+                        <Button Content="Отклонить" Width="90" Click="RejectUnfreezeRequest_Click" Tag="{Binding}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="FrozenBookCardTemplate">
+            <Border Margin="8" Padding="12" Background="White" CornerRadius="14" BorderBrush="#E3E3E3" BorderThickness="1" Width="320">
+                <StackPanel>
+                    <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="15" TextWrapping="Wrap"/>
+                    <TextBlock Text="{Binding Author}" Foreground="#666" Margin="0,4,0,0"/>
+                    <TextBlock Text="{Binding Reason}" TextWrapping="Wrap" Margin="0,8,0,0"/>
+                    <TextBlock Text="{Binding IsFrozenText}" Foreground="#0A6" Margin="0,8,0,0"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                        <Button Content="Разморозить" Width="110" Margin="0,0,8,0" Click="UnfreezeBook_Click" Tag="{Binding}"/>
+                        <Button Content="Оставить" Width="90" Click="KeepBookFrozen_Click" Tag="{Binding}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="FrozenUserCardTemplate">
+            <Border Margin="8" Padding="12" Background="White" CornerRadius="14" BorderBrush="#E3E3E3" BorderThickness="1" Width="320">
+                <StackPanel>
+                    <TextBlock Text="{Binding DisplayName}" FontWeight="Bold" FontSize="15"/>
+                    <TextBlock Text="{Binding Login}" Foreground="#666" Margin="0,4,0,0"/>
+                    <TextBlock Text="{Binding Reason}" TextWrapping="Wrap" Margin="0,8,0,0"/>
+                    <TextBlock Text="{Binding IsFrozenText}" Foreground="#0A6" Margin="0,8,0,0"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                        <Button Content="Разморозить" Width="110" Margin="0,0,8,0" Click="UnfreezeUser_Click" Tag="{Binding}"/>
+                        <Button Content="Оставить" Width="90" Click="KeepUserFrozen_Click" Tag="{Binding}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="UserCardTemplate">
+            <Border Margin="8" Padding="12" Background="White" CornerRadius="14" BorderBrush="#E3E3E3" BorderThickness="1" Width="360">
+                <StackPanel>
+                    <TextBlock Text="Пользователь" FontWeight="Bold" FontSize="15" Margin="0,0,0,8"/>
+
+                    <TextBlock Text="Логин"/>
+                    <TextBox Text="{Binding Login, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8"/>
+
+                    <TextBlock Text="Отображаемое имя"/>
+                    <TextBox Text="{Binding DisplayName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8"/>
+
+                    <TextBlock Text="Email"/>
+                    <TextBox Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8"/>
+
+                    <TextBlock Text="Роль"/>
+                    <ComboBox SelectedValue="{Binding RoleName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        SelectedValuePath="Tag"
+                        Margin="0,4,0,8">
+                        <ComboBoxItem Content="Читатель" Tag="Reader"/>
+                        <ComboBoxItem Content="Автор" Tag="Author"/>
+                        <ComboBoxItem Content="Администратор" Tag="Admin"/>
+                    </ComboBox>
+
+                    <CheckBox Content="Аккаунт заморожен"
+                              IsChecked="{Binding IsFrozen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              Margin="0,4,0,8"/>
+
+                    <TextBlock Text="Причина заморозки"/>
+                    <TextBox Text="{Binding FreezeReason, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="0,4,0,8"
+                             Height="60"
+                             AcceptsReturn="True"
+                             TextWrapping="Wrap"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <Button Content="Сохранить" Width="100" Margin="0,0,8,0" Click="SaveUser_Click" Tag="{Binding}" />
+                        
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+    </Page.Resources>
+
     <Grid>
         <TabControl>
             <TabItem Header="Жалобы">
-                <DataGrid x:Name="ComplaintsGrid"
-                          AutoGenerateColumns="True"
-                          IsReadOnly="True"
-                          CanUserAddRows="False"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="ComplaintsItems" ItemTemplate="{StaticResource ComplaintCardTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </ScrollViewer>
             </TabItem>
-            <TabItem Header="Снятие заморозки">
-                <DataGrid x:Name="RequestsGrid"
-                          AutoGenerateColumns="True"
-                          IsReadOnly="True"
-                          CanUserAddRows="False"/>
+
+            <TabItem Header="Заявки авторов">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="RoleRequestsItems" ItemTemplate="{StaticResource RoleRequestCardTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </ScrollViewer>
             </TabItem>
-            <TabItem Header="Заявки автора">
-                <DataGrid x:Name="AuthorRequestsGrid"
-                          AutoGenerateColumns="True"
-                          IsReadOnly="True"
-                          CanUserAddRows="False"/>
+
+            <TabItem Header="Заявки на разморозку">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="UnfreezeRequestsItems" ItemTemplate="{StaticResource UnfreezeRequestCardTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </ScrollViewer>
             </TabItem>
-            <TabItem Header="Заморозки">
-                <DataGrid x:Name="FrozenUsersGrid"
-                          AutoGenerateColumns="True"
-                          IsReadOnly="True"
-                          CanUserAddRows="False"/>
+
+            <TabItem Header="Замороженные книги">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="FrozenBooksItems" ItemTemplate="{StaticResource FrozenBookCardTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </ScrollViewer>
             </TabItem>
+
+            <TabItem Header="Замороженные пользователи">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="FrozenUsersItems" ItemTemplate="{StaticResource FrozenUserCardTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </ScrollViewer>
+            </TabItem>
+
             <TabItem Header="Пользователи">
-                <DataGrid x:Name="UsersGrid"
-                          AutoGenerateColumns="True"
-                          IsReadOnly="True"
-                          CanUserAddRows="False"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="UsersItems" ItemTemplate="{StaticResource UserCardTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </ScrollViewer>
             </TabItem>
         </TabControl>
     </Grid>

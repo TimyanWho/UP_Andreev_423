@@ -37,28 +37,19 @@ namespace UP_Andreev_423
                 return;
             }
 
-            var role = Core.Context.Roles
-                .ToList()
-                .FirstOrDefault(r =>
-                    DbUtil.Int(r, "RoleId", "Id") == DbUtil.Int(user, "RoleId", "IdRole"));
-
-            string roleName = DbUtil.Str(role, "RoleName", "Name", "Title");
-            if (string.IsNullOrWhiteSpace(roleName))
-                roleName = "Читатель";
-
-            int userId = DbUtil.Int(user, "UserId", "Id");
-            int roleId = DbUtil.Int(user, "RoleId", "IdRole");
+            string roleName = RoleNames.Normalize(DbUtil.Str(user, "RoleName", "Role", "RoleTitle"));
 
             Application.Current.Properties["CurrentUser"] = user;
-            Application.Current.Properties["UserId"] = userId;
+            Application.Current.Properties["UserId"] = DbUtil.Int(user, "UserId", "Id");
             Application.Current.Properties["UserLogin"] = DbUtil.Str(user, "Login", "UserLogin");
             Application.Current.Properties["DisplayName"] = DbUtil.Str(user, "DisplayName", "Name", "FullName", "Nickname", "Login");
             Application.Current.Properties["Email"] = DbUtil.Str(user, "Email", "Mail", "EMail");
-            Application.Current.Properties["RoleId"] = roleId;
             Application.Current.Properties["RoleName"] = roleName;
+            Application.Current.Properties["RoleDisplay"] = RoleNames.ToDisplay(roleName);
             Application.Current.Properties["IsFrozen"] = DbUtil.Bool(user, "IsFrozen", "Frozen", "Blocked");
             Application.Current.Properties["FreezeReason"] = DbUtil.Str(user, "FreezeReason", "Reason", "FreezeReasonText");
-            Application.Current.Properties["IsAuthor"] = roleName.IndexOf("автор", StringComparison.OrdinalIgnoreCase) >= 0;
+            Application.Current.Properties["IsAuthor"] = roleName == RoleNames.Author;
+            Application.Current.Properties["IsAdmin"] = roleName == RoleNames.Admin;
 
             var shell = new ShellWindow();
             shell.Show();
@@ -95,20 +86,22 @@ namespace UP_Andreev_423
                 return;
             }
 
-            var newUser = new Users();
-
-            DbUtil.Set(newUser, login, "Login", "UserLogin");
-            DbUtil.Set(newUser, password, "Password", "UserPassword");
-            DbUtil.Set(newUser, email, "Email", "Mail", "EMail");
-            DbUtil.Set(newUser, displayName, "DisplayName", "Name", "FullName", "Nickname");
-            DbUtil.Set(newUser, "Читатель", "RoleName", "Role", "RoleTitle");
-            DbUtil.Set(newUser, false, "IsFrozen", "Frozen", "Blocked");
-            DbUtil.Set(newUser, DateTime.Now, "CreatedAt", "CreateDate", "DateCreated");
+            var newUser = new Users
+            {
+                Login = login,
+                Email = email,
+                Password = password,
+                FullName = displayName,
+                RoleName = RoleNames.Reader,
+                IsFrozen = false,
+                CreatedAt = DateTime.Now
+            };
 
             try
             {
                 Core.Context.Users.Add(newUser);
                 Core.Context.SaveChanges();
+
                 MessageBox.Show("Пользователь зарегистрирован.");
 
                 RegNameBox.Clear();
@@ -116,22 +109,11 @@ namespace UP_Andreev_423
                 RegEmailBox.Clear();
                 RegPasswordBox.Clear();
             }
-            catch (DbEntityValidationException ex)
-            {
-                var sb = new StringBuilder();
-                foreach (var entity in ex.EntityValidationErrors)
-                {
-                    foreach (var err in entity.ValidationErrors)
-                    {
-                        sb.AppendLine($"{err.PropertyName}: {err.ErrorMessage}");
-                    }
-                }
-
-                MessageBox.Show(sb.Length > 0 ? sb.ToString() : ex.Message, "Ошибка регистрации");
-            }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Ошибка регистрации");
+                MessageBox.Show(ex.InnerException != null && ex.InnerException.InnerException != null
+                    ? ex.InnerException.InnerException.Message
+                    : ex.Message, "Ошибка регистрации");
             }
         }
     }

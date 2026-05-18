@@ -22,37 +22,57 @@ namespace UP_Andreev_423.Pages
 
         private void ListsPage_Loaded(object sender, RoutedEventArgs e)
         {
+            LoadGenres();
             LoadCards();
+            ApplyFilters();
         }
 
-        private void LoadCards(string filter = null)
+        private void LoadGenres()
+        {
+            var genreNames = new List<string> { "Все жанры" };
+
+            foreach (var g in Core.Context.Genres.ToList())
+            {
+                string name = DbUtil.Str(g, "GenreName", "Name", "Title");
+                if (!string.IsNullOrWhiteSpace(name) && !genreNames.Contains(name))
+                    genreNames.Add(name);
+            }
+
+            GenreBox.ItemsSource = genreNames;
+            GenreBox.SelectedIndex = 0;
+            SortBox.SelectedIndex = 0;
+        }
+
+        private void LoadCards()
         {
             var currentUser = Application.Current.Properties["CurrentUser"] as Users;
             if (currentUser == null)
                 return;
 
             int currentUserId = DbUtil.Int(currentUser, "UserId", "Id");
+            var books = Core.Context.Books.ToList();
+            var users = Core.Context.Users.ToList();
+            var reviews = Core.Context.Reviews.ToList();
 
-            var source = Core.Context.ReadingLists.ToList();
-
-            _allCards = source
+            _allCards = Core.Context.ReadingLists.ToList()
                 .Where(x => DbUtil.Int(x, "UserId", "OwnerId") == currentUserId)
                 .Select(rl =>
                 {
                     int bookId = DbUtil.Int(rl, "BookId", "IdBook");
-                    var book = Core.Context.Books.FirstOrDefault(b => DbUtil.Int(b, "BookId", "Id") == bookId);
+                    var book = books.FirstOrDefault(b => DbUtil.Int(b, "BookId", "Id") == bookId);
                     if (book == null)
                         return null;
 
                     int authorId = DbUtil.Int(book, "AuthorId", "UserId", "OwnerId", "Author");
-                    var author = Core.Context.Users.FirstOrDefault(u => DbUtil.Int(u, "UserId", "Id") == authorId);
+                    var author = users.FirstOrDefault(u => DbUtil.Int(u, "UserId", "Id") == authorId);
 
                     string authorName = author != null
                         ? DbUtil.Str(author, "DisplayName", "Name", "FullName", "Nickname", "Login")
                         : "Неизвестно";
 
                     string genres = ResolveGenres(book);
-                    double rating = ResolveRating(bookId);
+                    double rating = ResolveRating(reviews, bookId);
+                    string status = DbUtil.Str(rl, "ListState", "Status");
 
                     return new ListCard
                     {
@@ -61,62 +81,74 @@ namespace UP_Andreev_423.Pages
                         Title = DbUtil.Str(book, "Title", "Name"),
                         Author = authorName,
                         Genres = string.IsNullOrWhiteSpace(genres) ? "Жанры не указаны" : genres,
-                        RatingText = $"Рейтинг: {rating:0.00}",
-                        Status = DbUtil.Str(rl, "ListState", "Status"),
-                        CoverPath = DbUtil.Str(book, "CoverPath", "Cover", "ImagePath")
+                        Rating = rating,
+                        RatingText = string.Format("Рейтинг: {0:0.00}", rating),
+                        Status = status,
+                        CoverPath = DbUtil.Str(book, "CoverPath", "Cover", "ImagePath"),
+                        CoverImage = LoadImage(DbUtil.Str(book, "CoverPath", "Cover", "ImagePath"))
                     };
                 })
                 .Where(x => x != null)
                 .ToList();
+        }
 
-            if (!string.IsNullOrWhiteSpace(filter))
+        private void ApplyFilters_Click(object sender, RoutedEventArgs e)
+        {
+            ApplyFilters();
+        }
+
+        private void ApplyFilters()
+        {
+            IEnumerable<ListCard> query = _allCards;
+
+            string search = SearchBox.Text.Trim();
+            if (!string.IsNullOrWhiteSpace(search))
             {
-                _allCards = _allCards
-                    .Where(x => x.Title.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0 ||
-                                x.Author.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0)
-                    .ToList();
+                query = query.Where(b =>
+                    b.Title.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    b.Author.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0);
             }
 
-            AbandonedItems.ItemsSource = _allCards.Where(x => x.Status == "Заброшено").Select(ToView).ToList();
-            PlanItems.ItemsSource = _allCards.Where(x => x.Status == "В планах").Select(ToView).ToList();
-            ReadingItems.ItemsSource = _allCards.Where(x => x.Status == "Читаю").Select(ToView).ToList();
-            FinishedItems.ItemsSource = _allCards.Where(x => x.Status == "Прочитано").Select(ToView).ToList();
-        }
-
-        private object ToView(ListCard x)
-        {
-            return new
+            string selectedGenre = GenreBox.SelectedItem as string;
+            if (!string.IsNullOrWhiteSpace(selectedGenre) && selectedGenre != "Все жанры")
             {
-                x.BookId,
-                x.EntryId,
-                x.Title,
-                x.Author,
-                x.Genres,
-                x.RatingText,
-                x.Status,
-                CoverImage = LoadImage(x.CoverPath)
-            };
-        }
+                query = query.Where(b => b.Genres.IndexOf(selectedGenre, StringComparison.OrdinalIgnoreCase) >= 0);
+            }
 
-        private void Search_Click(object sender, RoutedEventArgs e)
-        {
-            LoadCards(SearchBox.Text.Trim());
+            switch (SortBox.SelectedIndex)
+            {
+                case 1:
+                    query = query.OrderByDescending(b => b.Rating).ThenBy(b => b.Title);
+                    break;
+                default:
+                    query = query.OrderBy(b => b.Title);
+                    break;
+            }
+
+            var list = query.ToList();
+
+            AbandonedItems.ItemsSource = list.Where(x => x.Status == "Заброшено").ToList();
+            PlanItems.ItemsSource = list.Where(x => x.Status == "В планах").ToList();
+            ReadingItems.ItemsSource = list.Where(x => x.Status == "Читаю").ToList();
+            FinishedItems.ItemsSource = list.Where(x => x.Status == "Прочитано").ToList();
         }
 
         private void Reset_Click(object sender, RoutedEventArgs e)
         {
             SearchBox.Clear();
-            LoadCards();
+            GenreBox.SelectedIndex = 0;
+            SortBox.SelectedIndex = 0;
+            ApplyFilters();
         }
 
         private void OpenBook_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.Tag != null)
-            {
-                int bookId = DbUtil.Int(btn.Tag, "BookId");
-                var shell = Window.GetWindow(this) as ShellWindow;
-                shell?.NavigateToBook(bookId);
-            }
+            var card = (sender as Button)?.Tag as ListCard;
+            if (card == null) return;
+
+            var shell = Window.GetWindow(this) as ShellWindow;
+            if (shell != null)
+                shell.NavigateToBook(card.BookId);
         }
 
         private void MoveStatus_Click(object sender, RoutedEventArgs e)
@@ -125,40 +157,48 @@ namespace UP_Andreev_423.Pages
             if (currentUser == null)
                 return;
 
-            int currentUserId = DbUtil.Int(currentUser, "UserId", "Id");
+            var button = sender as Button;
+            if (button == null || button.DataContext == null)
+                return;
 
-            if (sender is Button btn && btn.Tag != null)
+            var card = button.DataContext as ListCard;
+            if (card == null)
+                return;
+
+            string newStatus = button.Tag as string;
+            if (string.IsNullOrWhiteSpace(newStatus))
+                return;
+
+            var entry = Core.Context.ReadingLists.ToList().FirstOrDefault(x =>
+                DbUtil.Int(x, "UserId", "OwnerId") == DbUtil.Int(currentUser, "UserId", "Id") &&
+                DbUtil.Int(x, "BookId", "IdBook") == card.BookId);
+
+            if (entry == null)
+                return;
+
+            DbUtil.Set(entry, newStatus, "ListState", "Status");
+
+            try
             {
-                int bookId = DbUtil.Int(btn.Tag, "BookId");
-                var entry = Core.Context.ReadingLists.FirstOrDefault(x =>
-                    DbUtil.Int(x, "UserId", "OwnerId") == currentUserId &&
-                    DbUtil.Int(x, "BookId", "IdBook") == bookId);
-
-                if (entry == null)
-                    return;
-
-                string next = NextState(DbUtil.Str(entry, "ListState", "Status"));
-                DbUtil.Set(entry, next, "ListState", "Status");
                 Core.Context.SaveChanges();
-
-                LoadCards(SearchBox.Text.Trim());
+                LoadCards();
+                ApplyFilters();
             }
-        }
-
-        private static string NextState(string current)
-        {
-            if (current == "Заброшено") return "В планах";
-            if (current == "В планах") return "Читаю";
-            if (current == "Читаю") return "Прочитано";
-            return "Заброшено";
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.InnerException != null && ex.InnerException.InnerException != null
+                    ? ex.InnerException.InnerException.Message
+                    : ex.Message, "Ошибка");
+            }
         }
 
         private string ResolveGenres(object book)
         {
-            var nav = DbUtil.Items(book, "Genres", "Genre", "BookGenres");
+            var nav = DbUtil.Items(book, "Genres", "Genre", "BookGenres", "Genres1");
             if (nav != null)
             {
                 var names = new List<string>();
+
                 foreach (var item in nav)
                 {
                     string name = DbUtil.Str(item, "GenreName", "Name", "Title");
@@ -173,20 +213,19 @@ namespace UP_Andreev_423.Pages
             return DbUtil.Str(book, "GenresText", "GenreText", "GenreName");
         }
 
-        private double ResolveRating(int bookId)
+        private double ResolveRating(IEnumerable<Reviews> reviews, int bookId)
         {
-            var values = Core.Context.Reviews
-                .ToList()
+            var values = reviews
                 .Where(r => DbUtil.Int(r, "BookId", "IdBook") == bookId)
                 .Select(r =>
                 {
-                    var v = DbUtil.Get(r, "Rating", "Score");
-                    if (v == null) return 0d;
+                    object raw = DbUtil.Get(r, "Rating", "Score");
+                    if (raw == null) return 0d;
 
-                    try { return Convert.ToDouble(v, CultureInfo.InvariantCulture); }
+                    try { return Convert.ToDouble(raw, CultureInfo.InvariantCulture); }
                     catch
                     {
-                        try { return Convert.ToDouble(v); }
+                        try { return Convert.ToDouble(raw); }
                         catch { return 0d; }
                     }
                 })
@@ -223,9 +262,11 @@ namespace UP_Andreev_423.Pages
             public string Title { get; set; }
             public string Author { get; set; }
             public string Genres { get; set; }
+            public double Rating { get; set; }
             public string RatingText { get; set; }
             public string Status { get; set; }
             public string CoverPath { get; set; }
+            public ImageSource CoverImage { get; set; }
         }
     }
 }

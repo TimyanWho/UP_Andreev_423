@@ -5,30 +5,32 @@
       Background="#F3F3F3">
 
     <Grid>
-        <Border Background="White" CornerRadius="14" Padding="20">
-            <StackPanel Width="520">
-                <TextBlock Text="Добавление / редактирование книги"
-                           FontSize="22"
-                           FontWeight="Bold"
-                           Margin="0,0,0,14"/>
+        <Border Background="White" CornerRadius="14" Padding="18">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Width="700">
+                    <TextBlock Text="Добавление / редактирование книги" FontSize="24" FontWeight="Bold" Margin="0,0,0,16"/>
 
-                <TextBlock Text="Название"/>
-                <TextBox/>
+                    <TextBlock Text="Название"/>
+                    <TextBox x:Name="TitleBox" Margin="0,4,0,10"/>
 
-                <TextBlock Text="Описание"/>
-                <TextBox Height="80" AcceptsReturn="True" TextWrapping="Wrap"/>
+                    <TextBlock Text="Описание"/>
+                    <TextBox x:Name="DescriptionBox" Height="100" AcceptsReturn="True" TextWrapping="Wrap" Margin="0,4,0,10"/>
 
-                <TextBlock Text="Обложка"/>
-                <TextBox/>
+                    <TextBlock Text="Обложка (путь к файлу)"/>
+                    <TextBox x:Name="CoverPathBox" Margin="0,4,0,10"/>
 
-                <TextBlock Text="Жанры"/>
-                <TextBox/>
+                    <TextBlock Text="Жанры (через запятую)"/>
+                    <TextBox x:Name="GenresBox" Height="60" AcceptsReturn="True" TextWrapping="Wrap" Margin="0,4,0,10"/>
 
-                <TextBlock Text="Текст книги"/>
-                <TextBox Height="180" AcceptsReturn="True" TextWrapping="Wrap"/>
+                    <TextBlock Text="Текст книги"/>
+                    <TextBox x:Name="ContentBox" Height="260" AcceptsReturn="True" TextWrapping="Wrap" Margin="0,4,0,14"/>
 
-                <Button Content="Сохранить" Margin="0,16,0,0" Height="38"/>
-            </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Сохранить" Height="38" Width="120" Margin="0,0,10,0" Click="Save_Click"/>
+                        <Button Content="Назад" Height="38" Width="120" Click="Back_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
         </Border>
     </Grid>
 </Page>

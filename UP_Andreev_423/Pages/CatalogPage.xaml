@@ -4,6 +4,32 @@
       Title="CatalogPage"
       Background="#F3F3F3">
 
+    <Page.Resources>
+        <DataTemplate x:Key="BookCardTemplate">
+            <Border Width="230" Margin="8" Background="White" CornerRadius="14" Padding="12" BorderBrush="#E3E3E3" BorderThickness="1">
+                <StackPanel>
+                    <Border Height="170" Background="#F2F2F2" CornerRadius="10" ClipToBounds="True">
+                        <Image Source="{Binding CoverImage}" Stretch="UniformToFill"/>
+                    </Border>
+
+                    <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="15" TextWrapping="Wrap" Margin="0,10,0,4" Height="40"/>
+                    <TextBlock Text="{Binding Author}" Foreground="#666" TextWrapping="Wrap"/>
+                    <TextBlock Text="{Binding Genres}" Foreground="#666" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                    <TextBlock Text="{Binding RatingText}" Foreground="#444" Margin="0,6,0,0"/>
+
+                    <Button Content="Открыть" Margin="0,10,0,0" Click="OpenBook_Click" Tag="{Binding}"/>
+
+                    <WrapPanel Margin="0,8,0,0">
+                        <Button Content="В планах" Margin="0,0,6,6" Tag="В планах" Click="AddToList_Click"/>
+                        <Button Content="Читаю" Margin="0,0,6,6" Tag="Читаю" Click="AddToList_Click"/>
+                        <Button Content="Прочитано" Margin="0,0,6,6" Tag="Прочитано" Click="AddToList_Click"/>
+                        <Button Content="Заброшено" Margin="0,0,6,6" Tag="Заброшено" Click="AddToList_Click"/>
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+    </Page.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -11,40 +37,27 @@
         </Grid.RowDefinitions>
 
         <Border Background="White" CornerRadius="14" Padding="14" Margin="0,0,0,12">
-            <StackPanel Orientation="Horizontal">
-                <TextBox x:Name="SearchBox" Width="250" Height="34" Margin="0,0,10,0"/>
-                <Button Content="Поиск" Margin="0,0,10,0" Click="Search_Click"/>
-                <Button Content="Сброс" Click="Reset_Click"/>
-            </StackPanel>
+            <WrapPanel>
+                <TextBox x:Name="SearchBox" Width="250" Height="34" Margin="0,0,10,0" />
+                <Button Content="Поиск" Margin="0,0,10,0" Click="ApplyFilters_Click"/>
+                <Button Content="Сброс" Margin="0,0,16,0" Click="Reset_Click"/>
+
+                <ComboBox x:Name="SortBox" Width="160" Margin="0,0,10,0" SelectionChanged="ApplyFilters_Click">
+                    <ComboBoxItem Content="По названию"/>
+                    <ComboBoxItem Content="По рейтингу"/>
+                </ComboBox>
+
+                <ComboBox x:Name="GenreBox" Width="180" SelectionChanged="ApplyFilters_Click"/>
+            </WrapPanel>
         </Border>
 
-        <ScrollViewer Grid.Row="1">
-            <ItemsControl x:Name="BooksItems">
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ItemsControl x:Name="BooksItems" ItemTemplate="{StaticResource BookCardTemplate}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
-
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border Width="220" Height="340" Margin="8" Background="White" CornerRadius="14" Padding="12" BorderBrush="#E3E3E3" BorderThickness="1">
-                            <StackPanel>
-                                <Border Height="170" CornerRadius="10" Background="#F2F2F2" ClipToBounds="True">
-                                    <Image Source="{Binding CoverImage}" Stretch="UniformToFill"/>
-                                </Border>
-
-                                <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="15" TextWrapping="Wrap" Margin="0,10,0,4" Height="40"/>
-                                <TextBlock Text="{Binding Author}" Foreground="#666" TextWrapping="Wrap"/>
-                                <TextBlock Text="{Binding Genres}" Foreground="#666" TextWrapping="Wrap" Margin="0,2,0,0"/>
-                                <TextBlock Text="{Binding RatingText}" Foreground="#444" Margin="0,6,0,0"/>
-
-                                <Button Content="Открыть" Margin="0,10,0,0" Tag="{Binding BookId}" Click="OpenBook_Click"/>
-                                <Button Content="В список" Margin="0,6,0,0" Tag="{Binding BookId}" Click="AddToList_Click"/>
-                            </StackPanel>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
     </Grid>

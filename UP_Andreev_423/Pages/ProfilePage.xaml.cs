@@ -70,10 +70,10 @@ namespace UP_Andreev_423.Pages
             }
 
             var roles = Core.Context.Roles.ToList();
-            var authorRole = roles.FirstOrDefault(r => DbUtil.Str(r, "RoleName", "Name", "Title") == "Автор");
+            var authorRole = roles.FirstOrDefault(r => DbUtil.Str(r, "RoleName", "Name", "Title") == "RoleName");
             if (authorRole == null)
             {
-                MessageBox.Show("В таблице Roles не найдена роль 'Автор'.");
+                MessageBox.Show("В таблице Roles не найдена роль 'RoleName'.");
                 return;
             }
 
@@ -115,7 +115,6 @@ namespace UP_Andreev_423.Pages
             var request = new UnfreezeRequests();
             DbUtil.Set(request, userId, "RequesterUserId", "UserId");
             DbUtil.Set(request, userId, "TargetUserId", "FrozenUserId");
-            DbUtil.Set(request, null, "TargetBookId", "BookId");
             DbUtil.Set(request, reason, "Reason", "Motivation", "Comment");
             DbUtil.Set(request, "Новая", "Status");
             DbUtil.Set(request, DateTime.Now, "CreatedAt", "DateCreated");
@@ -144,7 +143,10 @@ namespace UP_Andreev_423.Pages
 
         private static string ResolveBookTitle(int bookId)
         {
-            var book = Core.Context.Books.FirstOrDefault(b => DbUtil.Int(b, "BookId", "Id") == bookId);
+            var book = Core.Context.Books
+                .ToList()
+                .FirstOrDefault(b => DbUtil.Int(b, "BookId", "Id") == bookId);
+
             return DbUtil.Str(book, "Title", "Name");
         }
 

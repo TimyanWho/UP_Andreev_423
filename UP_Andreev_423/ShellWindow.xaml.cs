@@ -14,30 +14,36 @@ namespace UP_Andreev_423
 
         private void ShellWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            Title = "Читай, Пиши и не спиши";
-
             string displayName = GetString("DisplayName", "Пользователь");
-            string roleName = GetString("RoleName", "Читатель");
-            int roleId = GetInt("RoleId", 0);
+            string roleName = RoleNames.Normalize(GetString("RoleName", "Reader"));
+            string roleDisplay = RoleNames.ToDisplay(roleName);
             bool isFrozen = GetBool("IsFrozen");
-            bool isAuthor = GetBool("IsAuthor");
-            string login = GetString("UserLogin", "");
+            bool isAuthor = roleName == RoleNames.Author;
+            bool isAdmin = roleName == RoleNames.Admin;
 
-            UserInfoText.Text = $"{displayName} | {roleName}";
-
-            bool isAdmin =
-                roleId == 3 ||
-                roleName.Equals("Администратор", StringComparison.OrdinalIgnoreCase) ||
-                roleName.Equals("Admin", StringComparison.OrdinalIgnoreCase) ||
-                login.Equals("admin", StringComparison.OrdinalIgnoreCase);
+            UserInfoText.Text = $"{displayName} | {roleDisplay}";
 
             AdminButton.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
-            AuthorButton.Visibility = isAuthor || roleId == 2 || roleName.Equals("Автор", StringComparison.OrdinalIgnoreCase)
-                ? Visibility.Visible
-                : Visibility.Collapsed;
+            AuthorButton.Visibility = isAuthor ? Visibility.Visible : Visibility.Collapsed;
             FrozenButton.Visibility = isFrozen ? Visibility.Visible : Visibility.Collapsed;
 
             MainFrame.Navigate(new Pages.CatalogPage());
+        }
+
+        private void OpenAdmin_Click(object sender, RoutedEventArgs e)
+        {
+            bool isAdmin =
+                GetInt("RoleId", 0) == 3 ||
+                GetString("Admin", "").Equals("Admin", StringComparison.OrdinalIgnoreCase) ||
+                GetString("UserLogin", "").Equals("admin", StringComparison.OrdinalIgnoreCase);
+
+            if (!isAdmin)
+            {
+                MessageBox.Show("Доступно только администратору.");
+                return;
+            }
+
+            MainFrame.Navigate(new Pages.AdminPage());
         }
 
 
@@ -50,22 +56,11 @@ namespace UP_Andreev_423
         {
             MainFrame.Navigate(new Pages.ReaderPage(bookId));
         }
-
-        private void OpenAdmin_Click(object sender, RoutedEventArgs e)
+        public void Navigate(Page page)
         {
-            bool isAdmin =
-                GetInt("RoleId", 0) == 3 ||
-                GetString("RoleName", "").Equals("Администратор", StringComparison.OrdinalIgnoreCase) ||
-                GetString("UserLogin", "").Equals("admin", StringComparison.OrdinalIgnoreCase);
-
-            if (!isAdmin)
-            {
-                MessageBox.Show("Доступно только администратору.");
-                return;
-            }
-
-            MainFrame.Navigate(new Pages.AdminPage());
+            MainFrame.Navigate(page);
         }
+
 
         private void Nav_Click(object sender, RoutedEventArgs e)
         {

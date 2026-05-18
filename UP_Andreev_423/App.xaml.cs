@@ -64,6 +64,9 @@ namespace UP_Andreev_423
                     {
                         if (value == null)
                         {
+                            if (prop.PropertyType.IsValueType && Nullable.GetUnderlyingType(prop.PropertyType) == null)
+                                continue;
+
                             prop.SetValue(obj, null);
                             return;
                         }
@@ -83,6 +86,45 @@ namespace UP_Andreev_423
         {
             var value = Get(obj, names);
             return value as IEnumerable;
+        }
+    }
+    public static class RoleNames
+    {
+        public const string Reader = "Reader";
+        public const string Author = "Author";
+        public const string Admin = "Admin";
+
+        public static string Normalize(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return Reader;
+
+            value = value.Trim();
+
+            if (value.Equals(Reader, StringComparison.OrdinalIgnoreCase) ||
+                value.Equals("Читатель", StringComparison.OrdinalIgnoreCase))
+                return Reader;
+
+            if (value.Equals(Author, StringComparison.OrdinalIgnoreCase) ||
+                value.Equals("Автор", StringComparison.OrdinalIgnoreCase))
+                return Author;
+
+            if (value.Equals(Admin, StringComparison.OrdinalIgnoreCase) ||
+                value.Equals("Администратор", StringComparison.OrdinalIgnoreCase))
+                return Admin;
+
+            return value;
+        }
+
+        public static string ToDisplay(string value)
+        {
+            string role = Normalize(value);
+
+            if (role == Reader) return "Читатель";
+            if (role == Author) return "Автор";
+            if (role == Admin) return "Администратор";
+
+            return role;
         }
     }
 }

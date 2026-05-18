@@ -20,8 +20,7 @@
                 <Button Content="Добавить в список" Height="38" Margin="0,8,0,0"/>
                 <Button Content="Жалоба на книгу" Height="38" Margin="0,8,0,0"/>
                 <Button Content="Жалоба на автора" Height="38" Margin="0,8,0,0"/>
-                <Button Content="Жалоба на отзыв" Height="38" Margin="0,8,0,0"/>
-                <Button x:Name="AdminFreezeButton" Content="Заморозить книгу / отзыв" Height="38" Margin="0,8,0,0"/>
+                <Button Content="Заморозить книгу / отзыв" Height="38" Margin="0,8,0,0"/>
             </StackPanel>
         </Border>
 
@@ -41,12 +40,29 @@
 
                     <Separator Margin="0,18,0,18"/>
 
-                    <TextBlock Text="Отзывы" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                    <DataGrid x:Name="ReviewsGrid"
-                              AutoGenerateColumns="True"
-                              IsReadOnly="True"
-                              CanUserAddRows="False"
-                              Height="220"/>
+                    <TextBlock Text="Отзывы" FontSize="18" FontWeight="SemiBold" Margin="0,20,0,8"/>
+                    <ItemsControl x:Name="ReviewsItems">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="0,0,0,10" Padding="12" CornerRadius="12" Background="#F8F8F8" BorderBrush="#E3E3E3" BorderThickness="1">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding User}" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding Rating}" Foreground="#666" Margin="0,4,0,0"/>
+                                        <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                            <Button Content="Пожаловаться на отзыв" Height="32" Click="ReportReview_Click" Tag="{Binding}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
                     <TextBlock Text="Оставить отзыв" FontSize="18" FontWeight="SemiBold" Margin="0,20,0,8"/>
                     <TextBox x:Name="ReviewTextBox" Height="90" AcceptsReturn="True" TextWrapping="Wrap"/>
