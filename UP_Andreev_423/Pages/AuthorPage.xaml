@@ -28,7 +28,7 @@
                 <TextBlock Text="Новая книга" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
 
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                    <TextBlock Text="Смайлик обложки:" VerticalAlignment="Center" Width="120"/>
+                    <TextBlock Text="Обложка (Win + .):" VerticalAlignment="Center" Width="120"/>
                     <TextBox x:Name="EmojiBox" Width="60" Text="📘" FontSize="24" TextAlignment="Center" MaxLength="2"/>
                     <TextBlock Text="(напр. 📘📕📗📙)" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="Gray"/>
                 </StackPanel>
