@@ -22,7 +22,6 @@
             <Button Content="🔄 Обновить" Click="Reload_Click" Width="100" Margin="8,0,0,0" />
         </StackPanel>
 
-        <!-- Форма создания книги (скрыта по умолчанию) -->
         <Border x:Name="CreateForm" Grid.Row="2" Visibility="Collapsed" Background="White" CornerRadius="10" Padding="16" Margin="0,0,0,12">
             <StackPanel>
                 <TextBlock Text="Новая книга" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
