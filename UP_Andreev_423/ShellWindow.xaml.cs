@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using UP_Andreev_423.Pages;
 
 namespace UP_Andreev_423
 {
@@ -13,22 +14,22 @@ namespace UP_Andreev_423
         }
 
         private void ShellWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            string displayName = GetString("DisplayName", "Пользователь");
-            string roleName = RoleNames.Normalize(GetString("RoleName", "Reader"));
-            string roleDisplay = RoleNames.ToDisplay(roleName);
-            bool isFrozen = GetBool("IsFrozen");
-            bool isAuthor = roleName == RoleNames.Author;
-            bool isAdmin = roleName == RoleNames.Admin;
+{
+    string displayName = GetString("DisplayName", "Пользователь");
+    string roleName = RoleNames.Normalize(GetString("RoleName", "Reader"));
+    string roleDisplay = RoleNames.ToDisplay(roleName);
+    bool isFrozen = GetBool("IsFrozen");
+    bool isAuthor = roleName == RoleNames.Author;
+    bool isAdmin = roleName == RoleNames.Admin;
 
-            UserInfoText.Text = $"{displayName} | {roleDisplay}";
+    UserInfoText.Text = $"{displayName} | {roleDisplay}";
 
-            AdminButton.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
-            AuthorButton.Visibility = isAuthor ? Visibility.Visible : Visibility.Collapsed;
-            FrozenButton.Visibility = isFrozen ? Visibility.Visible : Visibility.Collapsed;
+    AdminButton.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
+    AuthorButton.Visibility = isAuthor ? Visibility.Visible : Visibility.Collapsed;
+    FrozenButton.Visibility = isFrozen ? Visibility.Visible : Visibility.Collapsed;
 
-            MainFrame.Navigate(new Pages.CatalogPage());
-        }
+    MainFrame.Navigate(new Pages.CatalogPage());
+}
 
         private void OpenAdmin_Click(object sender, RoutedEventArgs e)
         {
@@ -54,7 +55,7 @@ namespace UP_Andreev_423
 
         public void NavigateToReader(int bookId)
         {
-            MainFrame.Navigate(new Pages.ReaderPage(bookId));
+            MainFrame.Navigate(new ReaderPage(bookId));
         }
         public void Navigate(Page page)
         {

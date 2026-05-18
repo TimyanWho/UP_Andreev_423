@@ -15,7 +15,7 @@
                         <DataGridTextColumn Header="Имя" Binding="{Binding FullName}" Width="150"/>
                         <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="180"/>
                         <DataGridTextColumn Header="Роль" Binding="{Binding RoleName}" Width="80"/>
-                        <DataGridTemplateColumn Header="Действия" Width="180">
+                        <DataGridTemplateColumn Header="Действия" Width="210">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">

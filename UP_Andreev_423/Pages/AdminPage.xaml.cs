@@ -16,17 +16,11 @@ namespace UP_Andreev_423.Pages
 
         private void AdminPage_Loaded(object sender, RoutedEventArgs e)
         {
-            if (ComplaintsItems == null || RoleRequestsItems == null || UnfreezeRequestsItems == null || FrozenBooksItems == null || FrozenUsersItems == null)
-            {
-                // Элементы ещё не созданы – попробуем перезагрузить страницу позже или просто выйдем
-                return;
-            }
+            Dispatcher.BeginInvoke(new Action(() => RefreshAll()), System.Windows.Threading.DispatcherPriority.Loaded);
+        }
 
-            if (Core.Context == null)
-            {
-                MessageBox.Show("База данных ещё не готова. Попробуйте позже.");
-                return;
-            }
+        private void RefreshAll()
+        {
             LoadUsers();
             LoadComplaints();
             LoadRoleRequests();
@@ -37,137 +31,112 @@ namespace UP_Andreev_423.Pages
 
         private void LoadUsers()
         {
-            var users = Core.Context.Users?.ToList() ?? new List<Users>();
-            UsersGrid.ItemsSource = users
-                .Select(u => new
-                {
-                    UserId = u.UserId,
-                    Login = u.Login,
-                    FullName = u.FullName,
-                    Email = u.Email,
-                    RoleName = u.RoleName
-                })
-                .OrderBy(u => u.RoleName)
-                .ToList();
+            if (UsersGrid == null) return;
+            var users = Core.Context.Users.ToList();
+            UsersGrid.ItemsSource = users.Select(u => new
+            {
+                u.UserId,
+                u.Login,
+                u.FullName,
+                u.Email,
+                u.RoleName
+            }).OrderBy(u => u.RoleName).ToList();
         }
 
         private void LoadComplaints()
         {
-            if (Core.Context == null || Core.Context.Complaints == null || ComplaintsItems == null)
-                return;
-
-            var complaints = Core.Context.Complaints.ToList();
+            if (ComplaintsItems == null) return;
             string filter = GetComboFilter(ComplaintStatusFilter);
-            var query = complaints.AsEnumerable();
-            if (filter != "Все") query = query.Where(c => c.Status == filter);
-
-            ComplaintsItems.ItemsSource = query
-                .Select(c => new
-                {
-                    ComplaintId = c.ComplaintId,
-                    Reason = c.Reason,
-                    StatusText = c.Status
-                })
-                .OrderByDescending(c => c.StatusText)
-                .ToList();
+            var complaints = Core.Context.Complaints.ToList();
+            if (filter != "Все")
+                complaints = complaints.Where(c => c.Status == filter).ToList();
+            ComplaintsItems.ItemsSource = complaints.Select(c => new
+            {
+                c.ComplaintId,
+                c.Reason,
+                StatusText = c.Status
+            }).OrderByDescending(c => c.StatusText).ToList();
         }
 
         private void LoadRoleRequests()
         {
-            if (Core.Context == null || Core.Context.RoleRequests == null || RoleRequestsItems == null)
-                return;
-
-            var requests = Core.Context.RoleRequests.ToList();
-            var users = Core.Context.Users?.ToList() ?? new List<Users>();
+            if (RoleRequestsItems == null) return;
             string filter = GetComboFilter(RoleRequestStatusFilter);
-            var query = requests.AsEnumerable();
-            if (filter != "Все") query = query.Where(r => r.Status == filter);
-
-            RoleRequestsItems.ItemsSource = query
-                .Select(r =>
+            var requests = Core.Context.RoleRequests.ToList();
+            if (filter != "Все")
+                requests = requests.Where(r => r.Status == filter).ToList();
+            var users = Core.Context.Users.ToList();
+            RoleRequestsItems.ItemsSource = requests.Select(r =>
+            {
+                var user = users.FirstOrDefault(u => u.UserId == r.UserId);
+                return new
                 {
-                    var user = users.FirstOrDefault(u => u.UserId == r.UserId);
-                    return new
-                    {
-                        RequestId = r.RequestId,
-                        UserDisplay = user != null ? user.FullName : "Аноним",
-                        Motivation = r.Motivation,
-                        Status = r.Status
-                    };
-                })
-                .OrderByDescending(r => r.Status)
-                .ToList();
+                    r.RequestId,
+                    UserDisplay = user?.FullName ?? "Аноним",
+                    r.Motivation,
+                    r.Status
+                };
+            }).OrderByDescending(r => r.Status).ToList();
         }
 
         private void LoadUnfreezeRequests()
         {
-            var requests = Core.Context.UnfreezeRequests.ToList();
+            if (UnfreezeRequestsItems == null) return;
             string filter = GetComboFilter(UnfreezeRequestStatusFilter);
-            var query = requests;
-            //if (filter != "Все") query = query.Where(r => r.Status == filter);
-            UnfreezeRequestsItems.ItemsSource = query
-                .Select(r => new
-                {
-                    RequestId = r.RequestId,
-                    Reason = r.Reason,
-                    Status = r.Status
-                })
-                .OrderByDescending(r => r.Status)
-                .ToList();
+            var requests = Core.Context.UnfreezeRequests.ToList();
+            if (filter != "Все")
+                requests = requests.Where(r => r.Status == filter).ToList();
+            UnfreezeRequestsItems.ItemsSource = requests.Select(r => new
+            {
+                r.RequestId,
+                r.Reason,
+                r.Status
+            }).OrderByDescending(r => r.Status).ToList();
         }
 
         private void LoadFrozenBooks()
         {
-            var books = Core.Context.Books?.ToList() ?? new List<Books>();
-            FrozenBooksItems.ItemsSource = books
-                .Where(b => b.IsFrozen)
-                .Select(b => new
-                {
-                    BookId = b.BookId,
-                    Title = b.Title,
-                    FreezeReason = b.FreezeReason
-                })
-                .OrderBy(b => b.Title)
-                .ToList();
+            if (FrozenBooksItems == null) return;
+            var books = Core.Context.Books.ToList().Where(b => b.IsFrozen).ToList();
+            FrozenBooksItems.ItemsSource = books.Select(b => new
+            {
+                b.BookId,
+                b.Title,
+                b.FreezeReason
+            }).OrderBy(b => b.Title).ToList();
         }
 
         private void LoadFrozenUsers()
         {
-            var users = Core.Context.Users?.ToList() ?? new List<Users>();
-            FrozenUsersItems.ItemsSource = users
-                .Where(u => u.IsFrozen)
-                .Select(u => new
-                {
-                    UserId = u.UserId,
-                    Login = u.Login,
-                    FreezeReason = u.FreezeReason
-                })
-                .OrderBy(u => u.Login)
-                .ToList();
+            if (FrozenUsersItems == null) return;
+            var users = Core.Context.Users.ToList().Where(u => u.IsFrozen).ToList();
+            FrozenUsersItems.ItemsSource = users.Select(u => new
+            {
+                u.UserId,
+                u.Login,
+                u.FreezeReason
+            }).OrderBy(u => u.Login).ToList();
         }
 
         private string GetComboFilter(ComboBox combo)
         {
-            if (combo.SelectedItem is ComboBoxItem item)
-                return item.Content.ToString();
-            return "Все";
+            return (combo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Все";
         }
 
         private void ComplaintStatusFilter_SelectionChanged(object sender, SelectionChangedEventArgs e) => LoadComplaints();
         private void RoleRequestStatusFilter_SelectionChanged(object sender, SelectionChangedEventArgs e) => LoadRoleRequests();
         private void UnfreezeRequestStatusFilter_SelectionChanged(object sender, SelectionChangedEventArgs e) => LoadUnfreezeRequests();
 
-        // Действия с пользователями
         private void ChangePassword_Click(object sender, RoutedEventArgs e)
         {
             if ((sender as Button)?.Tag is int userId)
             {
-                string newPassword = ShowInputDialog("Введите новый пароль:");
-                if (string.IsNullOrWhiteSpace(newPassword)) return;
+                var newPass = ShowInputDialog("Введите новый пароль:");
+                if (string.IsNullOrWhiteSpace(newPass)) return;
                 var user = Core.Context.Users.FirstOrDefault(u => u.UserId == userId);
                 if (user != null)
                 {
-                    user.Password = newPassword;
+                    user.Password = newPass;
                     Core.Context.SaveChanges();
                     MessageBox.Show("Пароль изменён.");
                     LoadUsers();
@@ -311,7 +280,7 @@ namespace UP_Andreev_423.Pages
 
         private string ShowInputDialog(string prompt)
         {
-            Window window = new Window
+            var window = new Window
             {
                 Title = "Ввод",
                 Width = 400,
@@ -319,28 +288,26 @@ namespace UP_Andreev_423.Pages
                 WindowStartupLocation = WindowStartupLocation.CenterScreen,
                 ResizeMode = ResizeMode.NoResize
             };
+            var grid = new Grid { Margin = new Thickness(10) };
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-            Grid grid = new Grid();
-            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) });
-            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) });
-            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) });
-            grid.Margin = new Thickness(10);
-
-            TextBlock promptText = new TextBlock { Text = prompt, Margin = new Thickness(0, 0, 0, 8) };
+            var promptText = new TextBlock { Text = prompt, Margin = new Thickness(0, 0, 0, 8) };
             Grid.SetRow(promptText, 0);
             grid.Children.Add(promptText);
 
-            TextBox inputBox = new TextBox { Margin = new Thickness(0, 0, 0, 8), Height = 24 };
+            var inputBox = new TextBox { Height = 24, Margin = new Thickness(0, 0, 0, 8) };
             Grid.SetRow(inputBox, 1);
             grid.Children.Add(inputBox);
 
-            StackPanel buttons = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
-            Button okBtn = new Button { Content = "OK", Width = 60, Margin = new Thickness(0, 0, 5, 0) };
-            Button cancelBtn = new Button { Content = "Отмена", Width = 60 };
-            buttons.Children.Add(okBtn);
-            buttons.Children.Add(cancelBtn);
-            Grid.SetRow(buttons, 2);
-            grid.Children.Add(buttons);
+            var buttonsPanel = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
+            var okBtn = new Button { Content = "OK", Width = 60, Margin = new Thickness(0, 0, 5, 0) };
+            var cancelBtn = new Button { Content = "Отмена", Width = 60 };
+            buttonsPanel.Children.Add(okBtn);
+            buttonsPanel.Children.Add(cancelBtn);
+            Grid.SetRow(buttonsPanel, 2);
+            grid.Children.Add(buttonsPanel);
 
             string result = null;
             okBtn.Click += (s, ev) => { result = inputBox.Text; window.Close(); };

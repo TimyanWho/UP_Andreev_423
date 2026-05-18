@@ -85,7 +85,14 @@ namespace UP_Andreev_423.Pages
         private void Read_Click(object sender, RoutedEventArgs e)
         {
             var shell = Window.GetWindow(this) as ShellWindow;
-            shell?.NavigateToBook(_bookId);
+            if (shell != null)
+            {
+                shell.NavigateToReader(_bookId);
+            }
+            else
+            {
+                MessageBox.Show("Не удалось открыть читалку.");
+            }
         }
 
         private void AddToList_Click(object sender, RoutedEventArgs e)
@@ -238,6 +245,7 @@ namespace UP_Andreev_423.Pages
                 MessageBox.Show("Ошибка сохранения отзыва:\n" + innerMessage);
             }
         }
+
 
         private string ShowInputDialog(string prompt)
         {
