@@ -31,7 +31,7 @@ namespace UP_Andreev_423.Pages
                 return;
             }
 
-            string cover = DbUtil.Str(book, "CoverImagePath");
+            string cover = DbUtil.Str(book, "CoverImagePath", "CoverPath", "Cover", "ImagePath");
             CoverEmojiBlock.Text = string.IsNullOrEmpty(cover) || cover.Length > 2 ? "📘" : cover;
             TitleBlock.Text = DbUtil.Str(book, "Title");
             DescriptionBlock.Text = DbUtil.Str(book, "Description");

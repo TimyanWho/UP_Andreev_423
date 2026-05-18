@@ -30,20 +30,19 @@ namespace UP_Andreev_423.Pages
 
             _allBooks = books.Select(b =>
             {
-                int bookId = DbUtil.Int(b, "BookId");
-                int authorId = DbUtil.Int(b, "AuthorUserId");
+                int bookId = DbUtil.Int(b, "BookId", "Id");
+                int authorId = DbUtil.Int(b, "AuthorUserId", "AuthorId", "UserId", "OwnerId", "Author");
 
                 string authorName = users
-                    .FirstOrDefault(u => DbUtil.Int(u, "UserId") == authorId)
+                    .FirstOrDefault(u => DbUtil.Int(u, "UserId", "Id") == authorId)
                     is object authorObj
-                    ? DbUtil.Str(authorObj, "FullName", "Login")
+                    ? DbUtil.Str(authorObj, "FullName", "Name", "DisplayName", "Nickname", "Login")
                     : "Неизвестно";
 
-                string coverEmoji = DbUtil.Str(b, "CoverImagePath") ?? "📘";
-                if (string.IsNullOrWhiteSpace(coverEmoji) || coverEmoji.Length > 2)
-                    coverEmoji = "📘";
+                string cover = DbUtil.Str(b, "CoverImagePath", "CoverPath", "Cover", "ImagePath");
+                string emoji = string.IsNullOrWhiteSpace(cover) || cover.Length > 2 ? "📘" : cover;
 
-                string title = DbUtil.Str(b, "Title");
+                string title = DbUtil.Str(b, "Title", "Name");
                 string genres = ResolveGenres(b);
                 double rating = ResolveRating(reviews, bookId);
 
@@ -54,7 +53,7 @@ namespace UP_Andreev_423.Pages
                     Author = authorName,
                     Genres = string.IsNullOrWhiteSpace(genres) ? "Жанры не указаны" : genres,
                     RatingText = $"Рейтинг: {rating:0.00}",
-                    CoverEmoji = coverEmoji
+                    CoverEmoji = emoji
                 };
             }).ToList();
 

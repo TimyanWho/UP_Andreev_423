@@ -9,7 +9,7 @@
             <Border Width="230" Margin="8" Background="White" CornerRadius="14" Padding="12" BorderBrush="#E3E3E3" BorderThickness="1">
                 <StackPanel>
                     <Border Height="170" Background="#F2F2F2" CornerRadius="10" ClipToBounds="True">
-                        <Image Source="{Binding CoverImage}" Stretch="UniformToFill"/>
+                        <TextBlock x:Name="CoverEmojiBlock" FontSize="48" VerticalAlignment="Center" Margin="0,0,12,0"/>
                     </Border>
 
                     <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="15" TextWrapping="Wrap" Margin="0,10,0,4" Height="40"/>
