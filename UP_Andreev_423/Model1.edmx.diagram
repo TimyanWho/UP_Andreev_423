@@ -4,26 +4,29 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="fc394f21a71a4e44ab3eeca01883e8c6" Name="Diagram1">
+      <Diagram DiagramId="e4e7f0f2d52f45e7af64caccfe8e9aae" Name="Diagram1">
         <EntityTypeShape EntityType="UP_Andreev_423Model.AuthorRoleApplications" Width="1.5" PointX="3" PointY="14.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="UP_Andreev_423Model.BookComplaints" Width="1.5" PointX="5.25" PointY="20.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="UP_Andreev_423Model.Books" Width="1.5" PointX="3" PointY="22.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="UP_Andreev_423Model.Complaints" Width="1.5" PointX="8.25" PointY="20.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="UP_Andreev_423Model.BookComplaints" Width="1.5" PointX="5.25" PointY="20.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="UP_Andreev_423Model.BookGenres" Width="1.5" PointX="5.25" PointY="25.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="UP_Andreev_423Model.Books" Width="1.5" PointX="3" PointY="22.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="UP_Andreev_423Model.Complaints" Width="1.5" PointX="8.25" PointY="20.625" IsExpanded="true" />
         <EntityTypeShape EntityType="UP_Andreev_423Model.FreezeAppeals" Width="1.5" PointX="3" PointY="27.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="UP_Andreev_423Model.Genres" Width="1.5" PointX="5.25" PointY="28.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="UP_Andreev_423Model.ReadingListItems" Width="1.5" PointX="5.25" PointY="25.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="UP_Andreev_423Model.ReadingLists" Width="1.5" PointX="5.25" PointY="17.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="UP_Andreev_423Model.Reviews" Width="1.5" PointX="8.25" PointY="25.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="UP_Andreev_423Model.RoleRequests" Width="1.5" PointX="6" PointY="13.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="UP_Andreev_423Model.Roles" Width="1.5" PointX="3.75" PointY="12" IsExpanded="true" />
+        <EntityTypeShape EntityType="UP_Andreev_423Model.Genres" Width="1.5" PointX="3.625" PointY="20" IsExpanded="true" />
+        <EntityTypeShape EntityType="UP_Andreev_423Model.ReadingListItems" Width="1.5" PointX="5.25" PointY="17.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="UP_Andreev_423Model.ReadingLists" Width="1.5" PointX="8.25" PointY="25.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="UP_Andreev_423Model.Reviews" Width="1.5" PointX="8.25" PointY="15.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="UP_Andreev_423Model.RoleRequests" Width="1.5" PointX="6" PointY="13.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="UP_Andreev_423Model.Roles" Width="1.5" PointX="3.75" PointY="12.125" IsExpanded="true" />
         <EntityTypeShape EntityType="UP_Andreev_423Model.sysdiagrams" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="UP_Andreev_423Model.UnfreezeRequests" Width="1.5" PointX="8.25" PointY="15.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="UP_Andreev_423Model.UnfreezeRequests" Width="1.5" PointX="11.25" PointY="20.625" IsExpanded="true" />
         <EntityTypeShape EntityType="UP_Andreev_423Model.Users" Width="1.5" PointX="0.75" PointY="17.875" IsExpanded="true" />
         <AssociationConnector Association="UP_Andreev_423Model.FK_AuthorRoleApplications_Admins" ManuallyRouted="false" />
         <AssociationConnector Association="UP_Andreev_423Model.FK_AuthorRoleApplications_Users" ManuallyRouted="false" />
         <AssociationConnector Association="UP_Andreev_423Model.FK_BookComplaints_Admins" ManuallyRouted="false" />
         <AssociationConnector Association="UP_Andreev_423Model.FK_BookComplaints_Books" ManuallyRouted="false" />
         <AssociationConnector Association="UP_Andreev_423Model.FK_BookComplaints_Users" ManuallyRouted="false" />
+        <AssociationConnector Association="UP_Andreev_423Model.FK_BookGenres_Books" ManuallyRouted="false" />
+        <AssociationConnector Association="UP_Andreev_423Model.FK_BookGenres_Genres" ManuallyRouted="false" />
         <AssociationConnector Association="UP_Andreev_423Model.FK_Books_Users" ManuallyRouted="false" />
         <AssociationConnector Association="UP_Andreev_423Model.FK_Complaints_Books" ManuallyRouted="false" />
         <AssociationConnector Association="UP_Andreev_423Model.FK_ReadingListItems_Books" ManuallyRouted="false" />
@@ -44,7 +47,6 @@
         <AssociationConnector Association="UP_Andreev_423Model.FK_UnfreezeRequests_Moderator" ManuallyRouted="false" />
         <AssociationConnector Association="UP_Andreev_423Model.FK_UnfreezeRequests_Requester" ManuallyRouted="false" />
         <AssociationConnector Association="UP_Andreev_423Model.FK_UnfreezeRequests_TargetUser" ManuallyRouted="false" />
-        <AssociationConnector Association="UP_Andreev_423Model.BookGenres" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
