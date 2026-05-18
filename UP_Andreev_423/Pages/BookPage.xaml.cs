@@ -24,7 +24,7 @@ namespace UP_Andreev_423.Pages
 
         private void LoadBook()
         {
-            var book = Core.Context.Books.ToList().FirstOrDefault(b => DbUtil.Int(b, "BookId") == _bookId);
+            var book = Core.Context.Books.ToList().FirstOrDefault(b => DbUtil.Int(b, "BookId", "Id") == _bookId);
             if (book == null)
             {
                 MessageBox.Show("Книга не найдена.");
@@ -33,50 +33,36 @@ namespace UP_Andreev_423.Pages
 
             string cover = DbUtil.Str(book, "CoverImagePath", "CoverPath", "Cover", "ImagePath");
             CoverEmojiBlock.Text = string.IsNullOrEmpty(cover) || cover.Length > 2 ? "📘" : cover;
-            TitleBlock.Text = DbUtil.Str(book, "Title");
+            TitleBlock.Text = DbUtil.Str(book, "Title", "Name");
             DescriptionBlock.Text = DbUtil.Str(book, "Description");
             RatingBlock.Text = $"Рейтинг: {DbUtil.Get(book, "Rating")}";
 
-            int authorId = DbUtil.Int(book, "AuthorUserId");
+            int authorId = DbUtil.Int(book, "AuthorUserId", "AuthorId", "UserId", "OwnerId", "Author");
             var users = Core.Context.Users.ToList();
-            var author = users.FirstOrDefault(u => DbUtil.Int(u, "UserId") == authorId);
-            AuthorBlock.Text = author != null ? DbUtil.Str(author, "FullName", "Login") : "Неизвестно";
+            var author = users.FirstOrDefault(u => DbUtil.Int(u, "UserId", "Id") == authorId);
+            AuthorBlock.Text = author != null ? DbUtil.Str(author, "FullName", "Name", "DisplayName", "Nickname", "Login") : "Неизвестно";
 
             string genres = ResolveGenres(book);
             GenresBlock.Text = string.IsNullOrWhiteSpace(genres) ? "Жанры не указаны" : genres;
-
-            var currentUser = Application.Current.Properties["CurrentUser"] as Users;
-            if (currentUser != null)
-            {
-                int currentUserId = DbUtil.Int(currentUser, "UserId");
-                bool isAuthor = authorId == currentUserId;
-                bool isAdmin = DbUtil.Str(currentUser, "RoleName") == "Admin";
-
-                EditButton.Visibility = (isAuthor || isAdmin) ? Visibility.Visible : Visibility.Collapsed;
-            }
-            else
-            {
-                EditButton.Visibility = Visibility.Collapsed;
-            }
         }
 
         private void LoadReviews()
         {
-            var reviews = Core.Context.Reviews.ToList().Where(r => DbUtil.Int(r, "BookId") == _bookId).ToList();
+            var reviews = Core.Context.Reviews.ToList().Where(r => DbUtil.Int(r, "BookId", "IdBook") == _bookId).ToList();
             var users = Core.Context.Users.ToList();
 
             ReviewsItems.ItemsSource = reviews.Select(r =>
             {
-                int userId = DbUtil.Int(r, "UserId");
-                var user = users.FirstOrDefault(u => DbUtil.Int(u, "UserId") == userId);
-                string userName = user != null ? DbUtil.Str(user, "FullName", "Login") : "Аноним";
-                int rating = Convert.ToInt32(DbUtil.Get(r, "Rating"));
+                int userId = DbUtil.Int(r, "UserId", "IdUser", "OwnerId", "Id");
+                var user = users.FirstOrDefault(u => DbUtil.Int(u, "UserId", "Id") == userId);
+                string userName = user != null ? DbUtil.Str(user, "FullName", "Name", "DisplayName", "Nickname", "Login") : "Аноним";
+                int rating = Convert.ToInt32(DbUtil.Get(r, "Rating", "Score"));
                 return new
                 {
-                    ReviewId = DbUtil.Int(r, "ReviewId"),
+                    ReviewId = DbUtil.Int(r, "ReviewId", "Id"),
                     UserDisplay = userName,
                     RatingDisplay = "★ " + rating + " / 10",
-                    Text = DbUtil.Str(r, "ReviewText")
+                    Text = DbUtil.Str(r, "ReviewText", "Text", "Content")
                 };
             }).ToList();
         }
@@ -111,23 +97,23 @@ namespace UP_Andreev_423.Pages
             }
 
             var lists = Core.Context.ReadingLists.ToList();
-            int currentUserId = DbUtil.Int(currentUser, "UserId");
+            int currentUserId = DbUtil.Int(currentUser, "UserId", "Id");
             var entry = lists.FirstOrDefault(x =>
-                DbUtil.Int(x, "UserId") == currentUserId &&
-                DbUtil.Int(x, "BookId") == _bookId);
+                DbUtil.Int(x, "UserId", "OwnerId") == currentUserId &&
+                DbUtil.Int(x, "BookId", "IdBook") == _bookId);
 
             if (entry == null)
             {
                 entry = new ReadingLists();
-                DbUtil.Set(entry, currentUserId, "UserId");
-                DbUtil.Set(entry, _bookId, "BookId");
-                DbUtil.Set(entry, "В планах", "ListState");
-                DbUtil.Set(entry, DateTime.Now, "AddedAt");
+                DbUtil.Set(entry, currentUserId, "UserId", "OwnerId");
+                DbUtil.Set(entry, _bookId, "BookId", "IdBook");
+                DbUtil.Set(entry, "В планах", "ListState", "Status");
+                DbUtil.Set(entry, DateTime.Now, "AddedAt", "CreatedAt");
                 Core.Context.ReadingLists.Add(entry);
             }
             else
             {
-                DbUtil.Set(entry, "В планах", "ListState");
+                DbUtil.Set(entry, "В планах", "ListState", "Status");
             }
 
             Core.Context.SaveChanges();
@@ -146,7 +132,7 @@ namespace UP_Andreev_423.Pages
             if (string.IsNullOrWhiteSpace(reason)) return;
 
             var complaint = new Complaints();
-            DbUtil.Set(complaint, DbUtil.Int(currentUser, "UserId"), "ComplainerUserId");
+            DbUtil.Set(complaint, DbUtil.Int(currentUser, "UserId", "Id"), "ComplainerUserId");
             DbUtil.Set(complaint, _bookId, "TargetBookId");
             DbUtil.Set(complaint, null, "TargetReviewId");
             DbUtil.Set(complaint, reason, "Reason");
@@ -172,7 +158,7 @@ namespace UP_Andreev_423.Pages
                 if (string.IsNullOrWhiteSpace(reason)) return;
 
                 var complaint = new Complaints();
-                DbUtil.Set(complaint, DbUtil.Int(currentUser, "UserId"), "ComplainerUserId");
+                DbUtil.Set(complaint, DbUtil.Int(currentUser, "UserId", "Id"), "ComplainerUserId");
                 DbUtil.Set(complaint, null, "TargetBookId");
                 DbUtil.Set(complaint, reviewId, "TargetReviewId");
                 DbUtil.Set(complaint, reason, "Reason");
@@ -185,9 +171,72 @@ namespace UP_Andreev_423.Pages
             }
         }
 
-        private void Edit_Click(object sender, RoutedEventArgs e)
+        private void SubmitReview_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Функция редактирования пока не реализована.");
+            if (!(Application.Current.Properties["CurrentUser"] is Users currentUser))
+            {
+                MessageBox.Show("Сначала войдите в аккаунт.");
+                return;
+            }
+
+            if (!int.TryParse(ReviewRatingBox.Text.Trim(), out int rating) || rating < 1 || rating > 10)
+            {
+                MessageBox.Show("Оценка должна быть от 1 до 10.");
+                return;
+            }
+
+            string text = ReviewTextBox.Text.Trim();
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                MessageBox.Show("Введите текст отзыва.");
+                return;
+            }
+
+            int userId = DbUtil.Int(currentUser, "UserId", "Id");
+            int bookId = _bookId;
+
+            bool alreadyExists = Core.Context.Reviews.ToList().Any(r => r.BookId == bookId && r.UserId == userId);
+            if (alreadyExists)
+            {
+                MessageBox.Show("Вы уже оставляли отзыв к этой книге.");
+                return;
+            }
+
+            try
+            {
+                var review = new Reviews
+                {
+                    BookId = bookId,
+                    UserId = userId,
+                    Rating = rating,
+                    ReviewText = text,
+                    IsFrozen = false,
+                    CreatedAt = DateTime.Now
+                };
+
+                Core.Context.Reviews.Add(review);
+                Core.Context.SaveChanges();
+
+                var reviews = Core.Context.Reviews.Where(r => r.BookId == bookId).ToList();
+                double avg = reviews.Any() ? reviews.Average(r => (double)r.Rating) : 0;
+                var book = Core.Context.Books.FirstOrDefault(b => b.BookId == bookId);
+                if (book != null)
+                {
+                    book.Rating = (decimal)Math.Round(avg, 2);
+                    Core.Context.SaveChanges();
+                }
+
+                MessageBox.Show("Отзыв добавлен.");
+                ReviewTextBox.Clear();
+                ReviewRatingBox.Text = "10";
+                LoadBook();
+                LoadReviews();
+            }
+            catch (System.Data.Entity.Infrastructure.DbUpdateException ex)
+            {
+                string innerMessage = ex.InnerException?.InnerException?.Message ?? ex.InnerException?.Message ?? ex.Message;
+                MessageBox.Show("Ошибка сохранения отзыва:\n" + innerMessage);
+            }
         }
 
         private string ShowInputDialog(string prompt)

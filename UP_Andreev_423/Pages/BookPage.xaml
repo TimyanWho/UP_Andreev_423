@@ -4,39 +4,51 @@
       Title="Книга"
       Background="#F3F3F3">
 
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal">
-            <TextBlock x:Name="CoverEmojiBlock" FontSize="48" VerticalAlignment="Center" Margin="0,0,12,0"/>
-            <StackPanel>
-                <TextBlock x:Name="TitleBlock" FontSize="22" FontWeight="Bold"/>
-                <TextBlock x:Name="AuthorBlock" FontSize="14" Foreground="#666"/>
-                <TextBlock x:Name="GenresBlock" FontSize="14" Foreground="#666"/>
-                <TextBlock x:Name="RatingBlock" FontSize="14" Foreground="#444"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="CoverEmojiBlock" FontSize="48" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                <StackPanel>
+                    <TextBlock x:Name="TitleBlock" FontSize="22" FontWeight="Bold"/>
+                    <TextBlock x:Name="AuthorBlock" FontSize="14" Foreground="#666"/>
+                    <TextBlock x:Name="GenresBlock" FontSize="14" Foreground="#666"/>
+                    <TextBlock x:Name="RatingBlock" FontSize="14" Foreground="#444"/>
+                </StackPanel>
             </StackPanel>
-        </StackPanel>
 
-        <TextBlock x:Name="DescriptionBlock" Grid.Row="1" TextWrapping="Wrap" Margin="0,12,0,12"/>
+            <TextBlock x:Name="DescriptionBlock" Grid.Row="1" TextWrapping="Wrap" Margin="0,12,0,12"/>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,12">
-            <Button Content="📖 Читать" Width="100" Click="Read_Click"/>
-            <Button Content="📋 В список" Width="110" Margin="8,0,0,0" Click="AddToList_Click"/>
-            <Button Content="🚩 Пожаловаться" Width="130" Margin="8,0,0,0" Click="ComplainBook_Click"/>
-            <Button x:Name="EditButton" Content="✏️ Редактировать" Width="130" Margin="8,0,0,0" Click="Edit_Click"/>
-        </StackPanel>
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,12">
+                <Button Content="📖 Читать" Width="100" Click="Read_Click"/>
+                <Button Content="📋 В список" Width="110" Margin="8,0,0,0" Click="AddToList_Click"/>
+                <Button Content="🚩 Пожаловаться" Width="130" Margin="8,0,0,0" Click="ComplainBook_Click"/>
+            </StackPanel>
 
-        <TextBlock Grid.Row="3" Text="Отзывы:" FontWeight="Bold" Margin="0,0,0,8"/>
+            <TextBlock Grid.Row="3" Text="Оставить отзыв:" FontWeight="Bold" Margin="0,0,0,8"/>
 
-        <ScrollViewer Grid.Row="4">
-            <ItemsControl x:Name="ReviewsItems">
+            <StackPanel Grid.Row="4" Margin="0,0,0,12">
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                    <TextBlock Text="Оценка (1-10):" VerticalAlignment="Center" Width="100"/>
+                    <TextBox x:Name="ReviewRatingBox" Width="50" Text="10" />
+                </StackPanel>
+                <TextBlock Text="Текст отзыва:" Margin="0,0,0,4"/>
+                <TextBox x:Name="ReviewTextBox" Height="80" TextWrapping="Wrap" AcceptsReturn="True" />
+                <Button Content="✉️ Отправить" Width="100" HorizontalAlignment="Left" Margin="0,6,0,0" Click="SubmitReview_Click" />
+            </StackPanel>
+
+            <TextBlock Grid.Row="5" Text="Отзывы:" FontWeight="Bold" Margin="0,0,0,8"/>
+
+            <ItemsControl Grid.Row="6" x:Name="ReviewsItems">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Border Margin="0,0,0,8" Padding="8" Background="White" CornerRadius="8" BorderBrush="#E3E3E3" BorderThickness="1">
@@ -50,6 +62,6 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-        </ScrollViewer>
-    </Grid>
+        </Grid>
+    </ScrollViewer>
 </Page>

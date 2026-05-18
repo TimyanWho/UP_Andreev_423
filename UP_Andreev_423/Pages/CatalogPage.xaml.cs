@@ -119,21 +119,21 @@ namespace UP_Andreev_423.Pages
             {
                 var lists = Core.Context.ReadingLists.ToList();
                 var entry = lists.FirstOrDefault(x =>
-                    DbUtil.Int(x, "UserId") == DbUtil.Int(currentUser, "UserId") &&
-                    DbUtil.Int(x, "BookId") == bookId);
+                    DbUtil.Int(x, "UserId", "OwnerId") == DbUtil.Int(currentUser, "UserId", "Id") &&
+                    DbUtil.Int(x, "BookId", "IdBook") == bookId);
 
                 if (entry == null)
                 {
                     entry = new ReadingLists();
-                    DbUtil.Set(entry, DbUtil.Int(currentUser, "UserId"), "UserId");
-                    DbUtil.Set(entry, bookId, "BookId");
-                    DbUtil.Set(entry, "В планах", "ListState");
-                    DbUtil.Set(entry, DateTime.Now, "AddedAt");
+                    DbUtil.Set(entry, DbUtil.Int(currentUser, "UserId", "Id"), "UserId", "OwnerId");
+                    DbUtil.Set(entry, bookId, "BookId", "IdBook");
+                    DbUtil.Set(entry, "В планах", "ListState", "Status");
+                    DbUtil.Set(entry, DateTime.Now, "AddedAt", "CreatedAt");
                     Core.Context.ReadingLists.Add(entry);
                 }
                 else
                 {
-                    DbUtil.Set(entry, "В планах", "ListState");
+                    DbUtil.Set(entry, "В планах", "ListState", "Status");
                 }
 
                 Core.Context.SaveChanges();
@@ -167,8 +167,8 @@ namespace UP_Andreev_423.Pages
         private double ResolveRating(IEnumerable<object> reviews, int bookId)
         {
             var values = reviews
-                .Where(r => DbUtil.Int(r, "BookId") == bookId)
-                .Select(r => (double?)GetDouble(DbUtil.Get(r, "Rating")))
+                .Where(r => DbUtil.Int(r, "BookId", "IdBook") == bookId)
+                .Select(r => (double?)GetDouble(DbUtil.Get(r, "Rating", "Score")))
                 .Where(v => v.HasValue)
                 .Select(v => v.Value)
                 .ToList();

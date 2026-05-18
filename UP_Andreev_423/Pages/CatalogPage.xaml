@@ -7,6 +7,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -18,7 +19,11 @@
             </StackPanel>
         </Border>
 
-        <ScrollViewer Grid.Row="1">
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="0,0,0,8">
+            <WrapPanel x:Name="GenresPanel" />
+        </ScrollViewer>
+
+        <ScrollViewer Grid.Row="2">
             <ItemsControl x:Name="BooksItems">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>

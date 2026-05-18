@@ -16,7 +16,10 @@ namespace UP_Andreev_423.Pages
             InitializeComponent();
             Loaded += AuthorPage_Loaded;
             LoadGenres();
+            DataContext = this;
         }
+
+        public Visibility CreateFormVisibility { get; set; } = Visibility.Collapsed;
 
         private void AuthorPage_Loaded(object sender, RoutedEventArgs e)
         {
@@ -50,7 +53,6 @@ namespace UP_Andreev_423.Pages
                     Title = DbUtil.Str(b, "Title", "Name"),
                     CoverEmoji = GetEmoji(DbUtil.Str(b, "CoverImagePath", "CoverPath", "Cover", "ImagePath")),
                     StatusText = DbUtil.Bool(b, "IsFrozen", "Frozen", "Blocked") ? "Заморожена" : "Опубликована",
-                    FreezeText = DbUtil.Str(b, "FreezeReason", "Reason"),
                     Rating = ResolveRating(reviews, DbUtil.Int(b, "BookId", "Id"))
                 }).ToList();
 
@@ -69,12 +71,16 @@ namespace UP_Andreev_423.Pages
 
         private void AddBook_Click(object sender, RoutedEventArgs e)
         {
-            CreateForm.Visibility = Visibility.Visible;
+            CreateFormVisibility = Visibility.Visible;
+            DataContext = null;
+            DataContext = this;
         }
 
         private void CancelCreate_Click(object sender, RoutedEventArgs e)
         {
-            CreateForm.Visibility = Visibility.Collapsed;
+            CreateFormVisibility = Visibility.Collapsed;
+            DataContext = null;
+            DataContext = this;
         }
 
         private void SaveBook_Click(object sender, RoutedEventArgs e)
@@ -134,7 +140,9 @@ namespace UP_Andreev_423.Pages
             Core.Context.SaveChanges();
 
             MessageBox.Show("Книга создана.");
-            CreateForm.Visibility = Visibility.Collapsed;
+            CreateFormVisibility = Visibility.Collapsed;
+            DataContext = null;
+            DataContext = this;
             LoadBooks();
 
             var shell = Window.GetWindow(this) as ShellWindow;
@@ -149,15 +157,6 @@ namespace UP_Andreev_423.Pages
             {
                 var shell = Window.GetWindow(this) as ShellWindow;
                 shell?.NavigateToBook(bookId);
-            }
-        }
-
-        private void EditBook_Click(object sender, RoutedEventArgs e)
-        {
-            if ((sender as Button)?.Tag is int bookId)
-            {
-                var shell = Window.GetWindow(this) as ShellWindow;
-                shell?.Navigate(new BookEditPage(bookId));
             }
         }
 
@@ -183,7 +182,6 @@ namespace UP_Andreev_423.Pages
             public string Title { get; set; }
             public string CoverEmoji { get; set; }
             public string StatusText { get; set; }
-            public string FreezeText { get; set; }
             public double Rating { get; set; }
             public string RatingText { get; set; }
         }
