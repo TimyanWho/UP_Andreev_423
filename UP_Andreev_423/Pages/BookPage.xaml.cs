@@ -1,19 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace UP_Andreev_423.Pages
 {
     public partial class BookPage : Page
     {
-        private readonly int _bookId;
+        private int _bookId;
 
         public BookPage(int bookId)
         {
@@ -25,219 +19,217 @@ namespace UP_Andreev_423.Pages
         private void BookPage_Loaded(object sender, RoutedEventArgs e)
         {
             LoadBook();
+            LoadReviews();
         }
 
         private void LoadBook()
         {
-            var book = Core.Context.Books
-                .ToList()
-                .FirstOrDefault(b => DbUtil.Int(b, "BookId", "Id") == _bookId);
-
+            var book = Core.Context.Books.ToList().FirstOrDefault(b => DbUtil.Int(b, "BookId") == _bookId);
             if (book == null)
+            {
+                MessageBox.Show("Книга не найдена.");
                 return;
+            }
 
+            string cover = DbUtil.Str(book, "CoverImagePath");
+            CoverEmojiBlock.Text = string.IsNullOrEmpty(cover) || cover.Length > 2 ? "📘" : cover;
+            TitleBlock.Text = DbUtil.Str(book, "Title");
+            DescriptionBlock.Text = DbUtil.Str(book, "Description");
+            RatingBlock.Text = $"Рейтинг: {DbUtil.Get(book, "Rating")}";
+
+            int authorId = DbUtil.Int(book, "AuthorUserId");
             var users = Core.Context.Users.ToList();
-            var reviews = Core.Context.Reviews.ToList();
+            var author = users.FirstOrDefault(u => DbUtil.Int(u, "UserId") == authorId);
+            AuthorBlock.Text = author != null ? DbUtil.Str(author, "FullName", "Login") : "Неизвестно";
 
-            int authorId = DbUtil.Int(book, "AuthorId", "UserId", "OwnerId", "Author");
-            string authorName = ResolveAuthorName(users, authorId);
+            string genres = ResolveGenres(book);
+            GenresBlock.Text = string.IsNullOrWhiteSpace(genres) ? "Жанры не указаны" : genres;
 
-            TitleText.Text = DbUtil.Str(book, "Title", "Name");
-            AuthorText.Text = "Автор: " + authorName;
-            GenreText.Text = "Жанры: " + ResolveGenres(book);
-            RatingText.Text = string.Format("Рейтинг: {0:0.00}", ResolveRating(reviews, _bookId));
-            DescriptionText.Text = DbUtil.Str(book, "Description", "Desc", "BookDescription");
-            ContentPreviewText.Text = DbUtil.Str(book, "ContentText", "TextContent", "BookText", "Content");
+            var currentUser = Application.Current.Properties["CurrentUser"] as Users;
+            if (currentUser != null)
+            {
+                int currentUserId = DbUtil.Int(currentUser, "UserId");
+                bool isAuthor = authorId == currentUserId;
+                bool isAdmin = DbUtil.Str(currentUser, "RoleName") == "Admin";
 
-            CoverImage.Source = LoadImage(DbUtil.Str(book, "CoverPath", "Cover", "ImagePath"));
+                EditButton.Visibility = (isAuthor || isAdmin) ? Visibility.Visible : Visibility.Collapsed;
+            }
+            else
+            {
+                EditButton.Visibility = Visibility.Collapsed;
+            }
+        }
 
-            var reviewCards = reviews
-                .Where(r => DbUtil.Int(r, "BookId", "IdBook") == _bookId)
-                .Select(r => new ReviewCard
+        private void LoadReviews()
+        {
+            var reviews = Core.Context.Reviews.ToList().Where(r => DbUtil.Int(r, "BookId") == _bookId).ToList();
+            var users = Core.Context.Users.ToList();
+
+            ReviewsItems.ItemsSource = reviews.Select(r =>
+            {
+                int userId = DbUtil.Int(r, "UserId");
+                var user = users.FirstOrDefault(u => DbUtil.Int(u, "UserId") == userId);
+                string userName = user != null ? DbUtil.Str(user, "FullName", "Login") : "Аноним";
+                int rating = Convert.ToInt32(DbUtil.Get(r, "Rating"));
+                return new
                 {
-                    ReviewId = DbUtil.Int(r, "ReviewId", "Id"),
-                    User = ResolveUserName(users, DbUtil.Int(r, "UserId", "ReviewerId", "AuthorId")),
-                    Rating = "Оценка: " + DbUtil.Int(r, "Rating", "Score"),
-                    Text = DbUtil.Str(r, "ReviewText", "Text", "Comment"),
-                    CreatedAt = DbUtil.Str(r, "CreatedAt", "DateCreated")
-                })
-                .ToList();
+                    ReviewId = DbUtil.Int(r, "ReviewId"),
+                    UserDisplay = userName,
+                    RatingDisplay = "★ " + rating + " / 10",
+                    Text = DbUtil.Str(r, "ReviewText")
+                };
+            }).ToList();
+        }
 
-            ReviewsItems.ItemsSource = reviewCards;
+        private string ResolveGenres(object book)
+        {
+            var nav = DbUtil.Items(book, "BookGenres");
+            if (nav != null)
+            {
+                var names = nav.Cast<object>().Select(bg => {
+                    int genreId = DbUtil.Int(bg, "GenreId");
+                    var genreObj = Core.Context.Genres.ToList().FirstOrDefault(g => DbUtil.Int(g, "GenreId") == genreId);
+                    return genreObj != null ? DbUtil.Str(genreObj, "GenreName") : null;
+                }).Where(n => n != null);
+                return string.Join(", ", names);
+            }
+            return null;
         }
 
         private void Read_Click(object sender, RoutedEventArgs e)
         {
             var shell = Window.GetWindow(this) as ShellWindow;
-            if (shell != null)
-                shell.NavigateToReader(_bookId);
+            shell?.NavigateToBook(_bookId);
         }
 
-        private void AddReview_Click(object sender, RoutedEventArgs e)
+        private void AddToList_Click(object sender, RoutedEventArgs e)
         {
-            int rating;
-            if (!int.TryParse(ReviewRatingBox.Text.Trim(), out rating) || rating < 1 || rating > 10)
-            {
-                MessageBox.Show("Оценка должна быть от 1 до 10.");
-                return;
-            }
-
-            string text = ReviewTextBox.Text.Trim();
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                MessageBox.Show("Введите текст отзыва.");
-                return;
-            }
-
-            var currentUser = Application.Current.Properties["CurrentUser"] as Users;
-            if (currentUser == null)
+            if (!(Application.Current.Properties["CurrentUser"] is Users currentUser))
             {
                 MessageBox.Show("Сначала войдите в аккаунт.");
                 return;
             }
 
-            int userId = DbUtil.Int(currentUser, "UserId", "Id");
-            if (userId == 0)
+            var lists = Core.Context.ReadingLists.ToList();
+            int currentUserId = DbUtil.Int(currentUser, "UserId");
+            var entry = lists.FirstOrDefault(x =>
+                DbUtil.Int(x, "UserId") == currentUserId &&
+                DbUtil.Int(x, "BookId") == _bookId);
+
+            if (entry == null)
             {
-                MessageBox.Show("Не удалось определить пользователя.");
+                entry = new ReadingLists();
+                DbUtil.Set(entry, currentUserId, "UserId");
+                DbUtil.Set(entry, _bookId, "BookId");
+                DbUtil.Set(entry, "В планах", "ListState");
+                DbUtil.Set(entry, DateTime.Now, "AddedAt");
+                Core.Context.ReadingLists.Add(entry);
+            }
+            else
+            {
+                DbUtil.Set(entry, "В планах", "ListState");
+            }
+
+            Core.Context.SaveChanges();
+            MessageBox.Show("Книга добавлена в список 'В планах'.");
+        }
+
+        private void ComplainBook_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(Application.Current.Properties["CurrentUser"] is Users currentUser))
+            {
+                MessageBox.Show("Сначала войдите в аккаунт.");
                 return;
             }
 
-            var review = new Reviews();
-            DbUtil.Set(review, _bookId, "BookId", "IdBook");
-            DbUtil.Set(review, userId, "UserId", "ReviewerId", "AuthorId");
-            DbUtil.Set(review, text, "ReviewText", "Text", "Comment");
-            DbUtil.Set(review, rating, "Rating", "Score");
-            DbUtil.Set(review, false, "IsFrozen", "Frozen", "Blocked");
-            DbUtil.Set(review, DateTime.Now, "CreatedAt", "DateCreated");
+            string reason = ShowInputDialog("Укажите причину жалобы на книгу:");
+            if (string.IsNullOrWhiteSpace(reason)) return;
 
-            try
+            var complaint = new Complaints();
+            DbUtil.Set(complaint, DbUtil.Int(currentUser, "UserId"), "ComplainerUserId");
+            DbUtil.Set(complaint, _bookId, "TargetBookId");
+            DbUtil.Set(complaint, null, "TargetReviewId");
+            DbUtil.Set(complaint, reason, "Reason");
+            DbUtil.Set(complaint, "Новая", "Status");
+            DbUtil.Set(complaint, DateTime.Now, "CreatedAt");
+            Core.Context.Complaints.Add(complaint);
+            Core.Context.SaveChanges();
+
+            MessageBox.Show("Жалоба отправлена.");
+        }
+
+        private void ComplainReview_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(Application.Current.Properties["CurrentUser"] is Users currentUser))
             {
-                Core.Context.Reviews.Add(review);
+                MessageBox.Show("Сначала войдите в аккаунт.");
+                return;
+            }
+
+            if (sender is Button btn && btn.Tag is int reviewId)
+            {
+                string reason = ShowInputDialog("Укажите причину жалобы на отзыв:");
+                if (string.IsNullOrWhiteSpace(reason)) return;
+
+                var complaint = new Complaints();
+                DbUtil.Set(complaint, DbUtil.Int(currentUser, "UserId"), "ComplainerUserId");
+                DbUtil.Set(complaint, null, "TargetBookId");
+                DbUtil.Set(complaint, reviewId, "TargetReviewId");
+                DbUtil.Set(complaint, reason, "Reason");
+                DbUtil.Set(complaint, "Новая", "Status");
+                DbUtil.Set(complaint, DateTime.Now, "CreatedAt");
+                Core.Context.Complaints.Add(complaint);
                 Core.Context.SaveChanges();
 
-                ReviewTextBox.Clear();
-                ReviewRatingBox.Text = "10";
-                LoadBook();
+                MessageBox.Show("Жалоба на отзыв отправлена.");
             }
-            catch (Exception ex)
+        }
+
+        private void Edit_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Функция редактирования пока не реализована.");
+        }
+
+        private string ShowInputDialog(string prompt)
+        {
+            Window window = new Window
             {
-                MessageBox.Show(ex.InnerException != null && ex.InnerException.InnerException != null
-                    ? ex.InnerException.InnerException.Message
-                    : ex.Message, "Ошибка добавления отзыва");
-            }
-        }
+                Title = "Ввод",
+                Width = 400,
+                Height = 200,
+                WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                ResizeMode = ResizeMode.NoResize
+            };
 
-        private void ReportReview_Click(object sender, RoutedEventArgs e)
-        {
-            var btn = sender as Button;
-            if (btn == null || btn.Tag == null)
-            {
-                MessageBox.Show("Не удалось определить отзыв.");
-                return;
-            }
+            Grid grid = new Grid();
+            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) });
+            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) });
+            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) });
+            grid.Margin = new Thickness(10);
 
-            var review = btn.Tag as ReviewCard;
-            if (review == null)
-            {
-                MessageBox.Show("Не удалось определить отзыв.");
-                return;
-            }
+            TextBlock promptText = new TextBlock { Text = prompt, Margin = new Thickness(0, 0, 0, 8) };
+            Grid.SetRow(promptText, 0);
+            grid.Children.Add(promptText);
 
-            MessageBox.Show("Жалоба на отзыв #" + review.ReviewId + " будет добавлена позже.");
-        }
+            TextBox inputBox = new TextBox { Margin = new Thickness(0, 0, 0, 8), Height = 24 };
+            Grid.SetRow(inputBox, 1);
+            grid.Children.Add(inputBox);
 
-        private string ResolveAuthorName(IEnumerable<object> users, int authorId)
-        {
-            var user = users.FirstOrDefault(u => DbUtil.Int(u, "UserId", "Id", "ID") == authorId);
-            return DbUtil.Str(user, "DisplayName", "Name", "FullName", "Nickname", "Login");
-        }
+            StackPanel buttons = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
+            Button okBtn = new Button { Content = "OK", Width = 60, Margin = new Thickness(0, 0, 5, 0) };
+            Button cancelBtn = new Button { Content = "Отмена", Width = 60 };
+            buttons.Children.Add(okBtn);
+            buttons.Children.Add(cancelBtn);
+            Grid.SetRow(buttons, 2);
+            grid.Children.Add(buttons);
 
-        private string ResolveUserName(IEnumerable<object> users, int userId)
-        {
-            var user = users.FirstOrDefault(u => DbUtil.Int(u, "UserId", "Id", "ID") == userId);
-            return DbUtil.Str(user, "DisplayName", "Name", "FullName", "Nickname", "Login");
-        }
+            string result = null;
+            okBtn.Click += (s, ev) => { result = inputBox.Text; window.Close(); };
+            cancelBtn.Click += (s, ev) => { result = null; window.Close(); };
 
-        private string ResolveGenres(object book)
-        {
-            var nav = DbUtil.Items(book, "Genres", "Genre", "BookGenres", "Genres1");
-            if (nav != null)
-            {
-                var names = new List<string>();
-
-                foreach (var item in nav)
-                {
-                    string name = DbUtil.Str(item, "GenreName", "Name", "Title");
-                    if (!string.IsNullOrWhiteSpace(name))
-                        names.Add(name);
-                }
-
-                if (names.Count > 0)
-                    return string.Join(", ", names);
-            }
-
-            return DbUtil.Str(book, "GenresText", "GenreText", "GenreName");
-        }
-
-        private double ResolveRating(IEnumerable<object> reviews, int bookId)
-        {
-            var values = reviews
-                .Where(r => DbUtil.Int(r, "BookId", "IdBook") == bookId)
-                .Select(r =>
-                {
-                    var raw = DbUtil.Get(r, "Rating", "Score");
-                    if (raw == null) return 0d;
-
-                    try
-                    {
-                        return Convert.ToDouble(raw, CultureInfo.InvariantCulture);
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            return Convert.ToDouble(raw);
-                        }
-                        catch
-                        {
-                            return 0d;
-                        }
-                    }
-                })
-                .ToList();
-
-            return values.Count == 0 ? 0 : values.Average();
-        }
-
-        private static ImageSource LoadImage(string path)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
-                    return null;
-
-                var bmp = new BitmapImage();
-                bmp.BeginInit();
-                bmp.CacheOption = BitmapCacheOption.OnLoad;
-                bmp.UriSource = new Uri(Path.GetFullPath(path), UriKind.Absolute);
-                bmp.EndInit();
-                bmp.Freeze();
-                return bmp;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        public class ReviewCard
-        {
-            public int ReviewId { get; set; }
-            public string User { get; set; }
-            public string Rating { get; set; }
-            public string Text { get; set; }
-            public string CreatedAt { get; set; }
+            window.Content = grid;
+            window.ShowDialog();
+            return result;
         }
     }
 }
